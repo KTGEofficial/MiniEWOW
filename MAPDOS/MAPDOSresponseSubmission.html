@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MAPDOS Response Submission</title>
+  <style>
+    body { font-family: sans-serif; padding: 2em; background: #fdf6e3; color: #333; }
+    textarea { width: 100%; height: 150px; font-size: 1.2em; margin-bottom: 1em; }
+    .output { font-size: 1.1em; margin-top: 1em; }
+    .label { font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>MAPDOS Response Submission</h1>
+  <textarea id="textInput" placeholder="Type your response here..."></textarea>
+  <div class="output">
+    <div><span class="label">Word Count:</span> <span id="wordCount">0</span></div>
+    <div><span class="label">Calorie Cost:</span> <span id="calorieCost">0</span></div>
+  </div>
+
+  <script>
+    let glyphData = {};
+
+    // Load glyph density JSON
+    fetch("http://ktgeofficial.github.io/MiniEWOW/MAPDOS/MAPDOSfontProportions.json")
+      .then(response => response.json())
+      .then(data => {
+        glyphData = data;
+      });
+
+    const textInput = document.getElementById("textInput");
+    const wordCountDisplay = document.getElementById("wordCount");
+    const calorieCostDisplay = document.getElementById("calorieCost");
+
+    function getWordCount(str) {
+      const words = str.split(" ");
+      let count = 0;
+      for (let word of words) {
+        if ([...word].some(ch => /\w/.test(ch))) {
+          count++;
+        }
+      }
+      return count;
+    }
+
+    function getCalorieCost(str) {
+      let cost = 0;
+      for (let ch of str) {
+        cost += glyphData[ch] || 0;
+      }
+      return cost;
+    }
+
+    textInput.addEventListener("input", () => {
+      const text = textInput.value;
+      wordCountDisplay.textContent = getWordCount(text);
+      calorieCostDisplay.textContent = getCalorieCost(text);
+    });
+  </script>
+</body>
+</html>
