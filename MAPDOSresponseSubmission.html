@@ -11,7 +11,10 @@
   </style>
 </head>
 <body>
-  <h1>MAPDOS Response Submission</h1>
+  <h1>MAPDOS Response Submission</h1><p>Choose your contestant</p>
+<select id="contestantSelect"></select>
+<div id="contestantInfo"></div>
+
   <input id="textInput" placeholder="Type your response here..." type="text">
   <div class="output">
     <div><span class="label">Word Count:</span> <span id="wordCount">0</span></div>
@@ -56,6 +59,93 @@
       wordCountDisplay.textContent = getWordCount(text);
       calorieCostDisplay.textContent = getCalorieCost(text);
     });
-  </script>
+  </script><script>
+  let glyphData = {};
+  let contestantData = {};
+
+  // Load glyph density JSON
+  fetch("http://ktgeofficial.github.io/MiniEWOW/MAPDOS/MAPDOSfontProportions.json")
+    .then(response => response.json())
+    .then(data => {
+      glyphData = data;
+    });
+
+  // Load MAPDOS contestant data
+  fetch("https://script.google.com/macros/s/AKfycby8dqJHtQwvecYUwulZQfqPNFP_WUZao-Gx54VFS_UMk68sUKMfx-WVIjmNkGtHxN2-/exec?mode=submissions")
+    .then(response => response.json())
+    .then(data => {
+      contestantData = data;
+      populateContestantDropdown(data);
+    });
+
+  function populateContestantDropdown(data) {
+    const select = document.getElementById("contestantSelect");
+    for (let key in data) {
+      if (key === "prompt") continue;
+      const option = document.createElement("option");
+      option.value = key;
+      option.textContent = key;
+      select.appendChild(option);
+    }
+
+    select.addEventListener("change", () => {
+      const selected = select.value;
+      displayContestantInfo(contestantData[selected]);
+    });
+  }
+
+  function displayContestantInfo(info) {
+    const container = document.getElementById("contestantInfo");
+    if (!info) return;
+
+    let html = `
+      <p><strong>Health:</strong> ${info.health}</p>
+      <p><strong>Stomach:</strong> ${info.stomach}</p>
+      <p><strong>Capacity:</strong> ${info.capacity}</p>
+      <p><strong>Rank:</strong> ${info.rank}</p>
+      <p><strong>Food:</strong></p>
+      <ul>
+    `;
+
+    for (let key in info.food) {
+      const item = info.food[key];
+      html += `<li>${item.name} (${item.food}) — Mass: ${item.mass}, Expired: ${item.expired}</li>`;
+    }
+
+    html += `</ul><p><strong>Prompt:</strong> ${contestantData.prompt}</p>`;
+    container.innerHTML = html;
+  }
+
+  // Word count and calorie cost logic
+  const textInput = document.getElementById("textInput");
+  const wordCountDisplay = document.getElementById("wordCount");
+  const calorieCostDisplay = document.getElementById("calorieCost");
+
+  function getWordCount(str) {
+    const words = str.split(" ");
+    let count = 0;
+    for (let word of words) {
+      if ([...word].some(ch => /\w/.test(ch))) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  function getCalorieCost(str) {
+    let cost = 0;
+    for (let ch of str) {
+      cost += glyphData[ch] || 0;
+    }
+    return cost;
+  }
+
+  textInput.addEventListener("input", () => {
+    const text = textInput.value;
+    wordCountDisplay.textContent = getWordCount(text);
+    calorieCostDisplay.textContent = getCalorieCost(text);
+  });
+</script>
+
 </body>
 </html>
