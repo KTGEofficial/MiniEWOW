@@ -22,41 +22,42 @@
   </div>
 <script>
   let glyphData = {};
-  let contestantData = {};
+  let mapdosData = {};
 
   // Load glyph density JSON
-  fetch("https://ktgeofficial.github.io/MiniEWOW/MAPDOS/MAPDOSfontProportions.json")
+  fetch("http://ktgeofficial.github.io/MiniEWOW/MAPDOS/MAPDOSfontProportions.json")
     .then(response => response.json())
     .then(data => {
       glyphData = data;
     });
 
-  // Load MAPDOS contestant data
+  // Load MAPDOS JSON from Apps Script
   fetch("https://script.google.com/macros/s/AKfycby8dqJHtQwvecYUwulZQfqPNFP_WUZao-Gx54VFS_UMk68sUKMfx-WVIjmNkGtHxN2-/exec?mode=submissions")
     .then(response => response.json())
     .then(data => {
-      contestantData = data;
-      populateContestantDropdown(data);
+      mapdosData = data;
+      populateUserDropdown(data);
+      displayPrompt(data.prompt);
     });
 
-  function populateContestantDropdown(data) {
-    const select = document.getElementById("contestantSelect");
-    for (let key in data) {
-      if (key === "prompt") continue;
+  function populateUserDropdown(data) {
+    const select = document.getElementById("userSelect");
+    for (let username in data) {
+      if (username === "prompt") continue;
       const option = document.createElement("option");
-      option.value = key;
-      option.textContent = key;
+      option.value = username;
+      option.textContent = username;
       select.appendChild(option);
     }
 
     select.addEventListener("change", () => {
-      const selected = select.value;
-      displayContestantInfo(contestantData[selected]);
+      const selectedUser = select.value;
+      displayUserInfo(mapdosData[selectedUser]);
     });
   }
 
-  function displayContestantInfo(info) {
-    const container = document.getElementById("contestantInfo");
+  function displayUserInfo(info) {
+    const container = document.getElementById("userInfo");
     if (!info) return;
 
     let html = `
@@ -64,7 +65,7 @@
       <p><strong>Stomach:</strong> ${info.stomach}</p>
       <p><strong>Capacity:</strong> ${info.capacity}</p>
       <p><strong>Rank:</strong> ${info.rank}</p>
-      <p><strong>Food:</strong></p>
+      <p><strong>Food Inventory:</strong></p>
       <ul>
     `;
 
@@ -73,8 +74,13 @@
       html += `<li>${item.name} (${item.food}) — Mass: ${item.mass}, Expired: ${item.expired}</li>`;
     }
 
-    html += `</ul><p><strong>Prompt:</strong> ${contestantData.prompt}</p>`;
+    html += `</ul>`;
     container.innerHTML = html;
+  }
+
+  function displayPrompt(promptText) {
+    const promptContainer = document.getElementById("promptDisplay");
+    promptContainer.innerHTML = `<p><strong>Prompt:</strong> ${promptText}</p>`;
   }
 
   // Word count and calorie cost logic
@@ -107,6 +113,7 @@
     calorieCostDisplay.textContent = getCalorieCost(text);
   });
 </script>
+
 
 </body>
 </html>
