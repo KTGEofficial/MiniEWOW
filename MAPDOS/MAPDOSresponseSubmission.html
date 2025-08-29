@@ -38,10 +38,11 @@
       .then(response => response.json())
       .then(data => {
         mapdosData = data;
+console.log(data);
         populateUserDropdown(data);
         displayPrompt(data.prompt);
       });
-console.log(data);
+
     function populateUserDropdown(data) {
       const select = document.getElementById("userSelect");
       for (let username in data) {
