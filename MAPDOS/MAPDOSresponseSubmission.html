@@ -14,7 +14,7 @@
   <h1>MAPDOS Response Submission</h1><p>Choose your contestant</p>
 <select id="userSelect"></select>
 
-<div id="contestantInfo"></div>
+<div id="userInfo"></div>
 
   <input id="textInput" placeholder="Type your response here..." type="text">
   <div class="output">
@@ -41,7 +41,7 @@
         populateUserDropdown(data);
         displayPrompt(data.prompt);
       });
-
+console.log(data);
     function populateUserDropdown(data) {
       const select = document.getElementById("userSelect");
       for (let username in data) {
