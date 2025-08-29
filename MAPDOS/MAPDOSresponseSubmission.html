@@ -1,157 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>MAPDOS Response Submission</title>
-    <style>
-        body { font-family: sans-serif; padding: 2em; background: #fdf6e3; color: #333; }
-        textarea { width: 100%; height: 150px; font-size: 1.2em; margin-bottom: 1em; }
-        .output { font-size: 1.1em; margin-top: 1em; }
-        .label { font-weight: bold; }
+  <meta charset="UTF-8">
+  <title>MAPDOS Response Submission</title>
+  <style>
+    body { font-family: sans-serif; padding: 2em; background: #fdf6e3; color: #333; }
+    textarea { width: 100%; height: 150px; font-size: 1.2em; margin-bottom: 1em; }
+    .output { font-size: 1.1em; margin-top: 1em; }
+    .label { font-weight: bold; }.health-bar-container {
+  width: 300px;
+  height: 30px;
+  background-color: #333;
+  border-radius: 15px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 1em;
+  box-shadow: inset 0 0 5px #000;
+}
 
-        /* New CSS for the health bar */
-        .health-bar-container {
-            width: 300px;
-            height: 25px;
-            background-color: #ccc;
-            border: 2px solid #000; /* Adds the black outline */
-            border-radius: 12px;
-            overflow: hidden;
-            position: relative;
-        }
+.health-bar-fill {
+  height: 100%;
+  width: 0%;
+  background-color: #fe467c; /* default */
+  transition: width 0.3s ease, background-color 0.3s ease;
+  border-radius: 15px 0 0 15px;
+}
 
-        .health-bar-fill {
-            height: 100%;
-            background-color: #fff; /* Initial color will be replaced by JS */
-            width: 0;
-        }
-    </style>
+.health-bar-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace;
+  font-weight: bold;
+  color: white;
+  pointer-events: none;
+}
+
+  </style>
 </head>
 <body>
-    <h1>MAPDOS Response Submission</h1>
-    <p>Choose your contestant</p>
-    <select id="userSelect"></select>
+  <h1>MAPDOS Response Submission</h1><p>Choose your contestant</p>
+<select id="userSelect"></select>
 
-    <div id="userInfo"></div>
-    <p>Prompt:</p>
-    <div id="promptDisplay"></div>
+<div id="userInfo"></div><p>Prompt:</p>
+<div id="promptDisplay"></div>
 
-    <input id="textInput" placeholder="Type your response here..." type="text">
-    <div class="output">
-        <div><span class="label">Word Count:</span> <span id="wordCount">0</span></div>
-        <div><span class="label">Calorie Cost:</span> <span id="calorieCost">0</span></div>
-    </div>
-    
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        let glyphData = {};
-        let mapdosData = {};
+  <input id="textInput" placeholder="Type your response here..." type="text">
+  <div class="output">
+    <div><span class="label">Word Count:</span> <span id="wordCount">0</span></div>
+    <div><span class="label">Calorie Cost:</span> <span id="calorieCost">0</span></div>
+  </div>
+<script>function interpolateColor(value, max) {
+  const pct = value / max;
 
-        // Load glyph density JSON
-        fetch("https://ktgeofficial.github.io/MiniEWOW/MAPDOS/MAPDOSfontProportions.json")
-            .then(response => response.json())
-            .then(data => {
-                glyphData = data;
-            });
+  const colorStops = [
+    { pct: 0.0, color: [254, 70, 124] },   // #fe467c
+    { pct: 0.5, color: [255, 255, 128] },  // #ffff80
+    { pct: 1.0, color: [0, 255, 128] }     // #00ff80
+  ];
 
-        // Load MAPDOS JSON from Apps Script
-        fetch("https://script.google.com/macros/s/AKfycbwyJSWWQCo3bZZQ7dahPebxZFsNY_mZN0n9SEIbrHTs-_GTv2hPzm9vJrkHLvgBDOF3/exec?mode=submissions")
-            .then(response => response.json())
-            .then(data => {
-                mapdosData = data;
-                console.log(data);
-                populateUserDropdown(data);
-                displayPrompt(data.prompt);
-            });
+  let lower = colorStops[0], upper = colorStops[2];
+  for (let i = 1; i < colorStops.length; i++) {
+    if (pct <= colorStops[i].pct) {
+      upper = colorStops[i];
+      lower = colorStops[i - 1];
+      break;
+    }
+  }
 
-        function populateUserDropdown(data) {
-            const select = document.getElementById("userSelect");
-            select.innerHTML = "";
-            
-            Object.keys(data).forEach(key => {
-                if (key === "prompt") return;
-                const option = document.createElement("option");
-                option.value = key;
-                option.textContent = key;
-                select.appendChild(option);
-            });
+  const range = upper.pct - lower.pct;
+  const rangePct = (pct - lower.pct) / range;
 
-            const firstUser = select.options[0]?.value;
-            if (firstUser) displayUserInfo(data[firstUser]);
+  const interpolated = lower.color.map((c, i) =>
+    Math.round(c + (upper.color[i] - c) * rangePct)
+  );
 
-            select.addEventListener("change", () => {
-                displayUserInfo(data[select.value]);
-            });
-        }
+  return `rgb(${interpolated.join(",")})`;
+}
 
-        function getHealthColor(value, max) {
-            const hue = (value / max) * 120;
-            return `hsl(${hue}, 100%, 45%)`;
-        }
-        
-        function displayUserInfo(info) {
-            const container = document.getElementById("userInfo");
-            if (!info) return;
+function updateHealthBar(value, max) {
+  const fill = document.getElementById("healthFill");
+  const text = document.getElementById("healthText");
+  const pct = (value / max) * 100;
 
-            // Calculate percentage and color
-            const healthPct = (info.health / info.capacity) * 100;
-            const healthColor = getHealthColor(info.health, info.capacity);
+  fill.style.width = pct + "%";
+  fill.style.backgroundColor = interpolateColor(value, max);
+  text.textContent = `${value} / ${max}`;
+}
 
-            let html = `
-                <div class="health-bar-container">
-                    <div class="health-bar-fill" style="width: ${healthPct}%; background-color: ${healthColor};"></div>
-                </div>
-                <p><strong>Stomach:</strong> ${info.stomach}</p>
-                <p><strong>Capacity:</strong> ${info.capacity}</p>
-                <p><strong>Rank:</strong> ${info.rank}</p>
-                <p><strong>Food Inventory:</strong></p>
-                <ul>
-            `;
+  document.addEventListener("DOMContentLoaded", () => {
+    let glyphData = {};
+    let mapdosData = {};
 
-            for (let key in info.food) {
-                const item = info.food[key];
-                html += `<li>${item.name} (${item.food}) — Mass: ${item.mass}, Expired: ${item.expired}</li>`;
-            }
+    // Load glyph density JSON
+    fetch("https://ktgeofficial.github.io/MiniEWOW/MAPDOS/MAPDOSfontProportions.json")
+      .then(response => response.json())
+      .then(data => {
+        glyphData = data;
+      });
 
-            html += `</ul>`;
-            container.innerHTML = html;
-        }
+    // Load MAPDOS JSON from Apps Script
+    fetch("https://script.google.com/macros/s/AKfycbwyJSWWQCo3bZZQ7dahPebxZFsNY_mZN0n9SEIbrHTs-_GTv2hPzm9vJrkHLvgBDOF3/exec?mode=submissions")
+      .then(response => response.json())
+      .then(data => {
+        mapdosData = data;
+console.log(data);
+        populateUserDropdown(data);
+        displayPrompt(data.prompt);
+      });
 
-        function displayPrompt(promptText) {
-            const promptContainer = document.getElementById("promptDisplay");
-            promptContainer.innerHTML = `<p><strong>Prompt:</strong> ${promptText}</p>`;
-        }
+    function populateUserDropdown(data) {
+  const select = document.getElementById("userSelect");
+  select.innerHTML = "";        // clear any old options
 
-        const textInput = document.getElementById("textInput");
-        const wordCountDisplay = document.getElementById("wordCount");
-        const calorieCostDisplay = document.getElementById("calorieCost");
+  Object.keys(data).forEach(key => {
+    if (key === "prompt") return;
+    const option = document.createElement("option");
+    option.value = key;
+    option.textContent = key;
+    select.appendChild(option);
+  });
 
-        function getWordCount(str) {
-            const words = str.split(" ");
-            let count = 0;
-            for (let word of words) {
-                if ([...word].some(ch => /\w/.test(ch))) {
-                    count++;
-                }
-            }
-            return count;
-        }
+  // Immediately display the first user’s info if you like
+  const firstUser = select.options[0]?.value;
+  if (firstUser) displayUserInfo(data[firstUser]);
 
-        function getCalorieCost(str) {
-            let cost = 0;
-            for (let ch of str) {
-                cost += glyphData[ch] || 0;
-            }
-            return cost;
-        }
+  select.addEventListener("change", () => {
+    displayUserInfo(data[select.value]);
+  });
+}
 
-        textInput.addEventListener("input", () => {
-            const text = textInput.value;
-            wordCountDisplay.textContent = getWordCount(text);
-            calorieCostDisplay.textContent = getCalorieCost(text);
-        });
-    });
+
+    function displayUserInfo(info) {
+      const container = document.getElementById("userInfo");
+      if (!info) return;
+
+      let html = `
+        <div class="health-bar-container">
+  <div class="health-bar-fill" id="healthFill"></div>
+</div>
+
+        <p><strong>Stomach:</strong> ${info.stomach}</p>
+        <p><strong>Capacity:</strong> ${info.capacity}</p>
+        <p><strong>Rank:</strong> ${info.rank}</p>
+        <p><strong>Food Inventory:</strong></p>
+        <ul>
+      `;
+
+      for (let key in info.food) {
+        const item = info.food[key];
+        html += `<li>${item.name} (${item.food}) — Mass: ${item.mass}, Expired: ${item.expired}</li>`;
+      }
+
+      html += `</ul>`;
+      container.innerHTML = html;updateHealthBar(info.health, 99);
+
+    }
+
+    function displayPrompt(promptText) {
+      const promptContainer = document.getElementById("promptDisplay");
+      promptContainer.innerHTML = `<p><strong>Prompt:</strong> ${promptText}</p>`;
+    }
+
+    // Word count and calorie cost logic
+    const textInput = document.getElementById("textInput");
+    const wordCountDisplay = document.getElementById("wordCount");
+    const calorieCostDisplay = document.getElementById("calorieCost");
+
+    function getWordCount(str) {
+      const words = str.split(" ");
+      let count = 0;
+      for (let word of words) {
+        if ([...word].some(ch => /\w/.test(ch))) {
+          count++;
+        }
+      }
+      return count;
+    }
+
+    function getCalorieCost(str) {
+      let cost = 0;
+      for (let ch of str) {
+        cost += glyphData[ch] || 0;
+      }
+      return cost;
+    }
+
+    textInput.addEventListener("input", () => {
+      const text = textInput.value;
+      wordCountDisplay.textContent = getWordCount(text);
+      calorieCostDisplay.textContent = getCalorieCost(text);
+    });
+  });
 </script>
+
+
 
 </body>
 </html>
