@@ -13,8 +13,6 @@
 <body>
   <h1>MAPDOS Response Submission</h1><p>Choose your contestant</p>
 <select id="userSelect"></select>
-
-<div id="userInfo"></div><p>Prompt:</p>
 <div id="promptDisplay"></div>
 
   <input id="textInput" placeholder="Type your response here..." type="text">
@@ -35,7 +33,7 @@
       });
 
     // Load MAPDOS JSON from Apps Script
-    fetch("https://script.google.com/macros/s/AKfycbwyJSWWQCo3bZZQ7dahPebxZFsNY_mZN0n9SEIbrHTs-_GTv2hPzm9vJrkHLvgBDOF3/exec?mode=submissions")
+    fetch("https://script.google.com/macros/s/AKfycbw1iY86evimRga_XhGddO2AlQyb63srbFsSeC-31RGc5FmKir9-EyG7tUIs6PS8MDai/exec?mode=submissions")
       .then(response => response.json())
       .then(data => {
         mapdosData = data;
