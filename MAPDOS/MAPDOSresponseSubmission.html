@@ -44,14 +44,27 @@ console.log(data);
       });
 
     function populateUserDropdown(data) {
-      const select = document.getElementById("userSelect");
-      for (let username in data) {
-        if (username === "prompt") continue;
-        const option = document.createElement("option");
-        option.value = username;
-        option.textContent = username;
-        select.appendChild(option);
-      }
+  const select = document.getElementById("userSelect");
+
+  // If data is an array, flatten it into a single object
+  if (Array.isArray(data)) {
+    data = Object.assign({}, ...data);
+  }
+
+  for (let username in data) {
+    if (username === "prompt") continue;
+    const option = document.createElement("option");
+    option.value = username;
+    option.textContent = username;
+    select.appendChild(option);
+  }
+
+  select.addEventListener("change", () => {
+    const selectedUser = select.value;
+    displayUserInfo(mapdosData[selectedUser]);
+  });
+}
+
 
       select.addEventListener("change", () => {
         const selectedUser = select.value;
