@@ -21,107 +21,122 @@
     <div><span class="label">Calorie Cost:</span> <span id="calorieCost">0</span></div>
   </div>
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    let glyphData = {};
-    let mapdosData = {};
+document.addEventListener("DOMContentLoaded", () => {
+  let glyphData = {};
+  let mapdosData = {};
 
-    // Load glyph density JSON
-    fetch("https://ktgeofficial.github.io/MiniEWOW/MAPDOS/MAPDOSfontProportions.json")
-      .then(response => response.json())
-      .then(data => {
-        glyphData = data;
-      });
-
-    // Load MAPDOS JSON from Apps Script
-    fetch("https://script.google.com/macros/s/AKfycbw1iY86evimRga_XhGddO2AlQyb63srbFsSeC-31RGc5FmKir9-EyG7tUIs6PS8MDai/exec?mode=submissions")
-      .then(response => response.json())
-      .then(data => {
-        mapdosData = data;
-console.log(data);
-        populateUserDropdown(data);
-        displayPrompt(data.prompt);
-      });
-
-    function populateUserDropdown(data) {
+  // DOM references
   const select = document.getElementById("userSelect");
-  select.innerHTML = "";        // clear any old options
+  const userInfoContainer = document.getElementById("userInfo");
+  const promptContainer = document.getElementById("promptDisplay");
+  const textInput = document.getElementById("textInput");
+  const wordCountDisplay = document.getElementById("wordCount");
+  const calorieCostDisplay = document.getElementById("calorieCost");
 
-  Object.keys(data).forEach(key => {
-    if (key === "prompt") return;
-    const option = document.createElement("option");
-    option.value = key;
-    option.textContent = key;
-    select.appendChild(option);
-  });
+  // Defensive check
+  if (!select || !userInfoContainer || !promptContainer || !textInput || !wordCountDisplay || !calorieCostDisplay) {
+    console.error("Missing one or more required DOM elements.");
+    return;
+  }
 
-  // Immediately display the first user’s info if you like
-  const firstUser = select.options[0]?.value;
-  if (firstUser) displayUserInfo(data[firstUser]);
+  // Load glyph density JSON
+  fetch("https://ktgeofficial.github.io/MiniEWOW/MAPDOS/MAPDOSfontProportions.json")
+    .then(response => response.json())
+    .then(data => {
+      glyphData = data;
+    })
+    .catch(err => console.error("Failed to load glyph data:", err));
 
-  select.addEventListener("change", () => {
-    displayUserInfo(data[select.value]);
-  });
-}
+  // Load MAPDOS JSON from Apps Script
+  fetch("https://script.google.com/macros/s/AKfycbw1iY86evimRga_XhGddO2AlQyb63srbFsSeC-31RGc5FmKir9-EyG7tUIs6PS8MDai/exec?mode=submissions")
+    .then(response => response.json())
+    .then(data => {
+      mapdosData = data;
+      console.log("MAPDOS Data:", data);
+      populateUserDropdown(data);
+      displayPrompt(data.prompt);
+    })
+    .catch(err => console.error("Failed to load MAPDOS data:", err));
 
+  function populateUserDropdown(data) {
+    select.innerHTML = ""; // Clear old options
 
-    function displayUserInfo(info) {
-      const container = document.getElementById("userInfo");
-      if (!info) return;
-
-      let html = `
-        <p><strong>Health:</strong> ${info.health}</p>
-        <p><strong>Stomach:</strong> ${info.stomach}</p>
-        <p><strong>Capacity:</strong> ${info.capacity}</p>
-        <p><strong>Rank:</strong> ${info.rank}</p>
-        <p><strong>Food Inventory:</strong></p>
-        <ul>
-      `;
-
-      for (let key in info.food) {
-        const item = info.food[key];
-        html += `<li>${item.name} (${item.food}) — Mass: ${item.mass}, Expired: ${item.expired}</li>`;
-      }
-
-      html += `</ul>`;
-      container.innerHTML = html;
-    }
-
-    function displayPrompt(promptText) {
-      const promptContainer = document.getElementById("promptDisplay");
-      promptContainer.innerHTML = `<p><strong>Prompt:</strong> ${promptText}</p>`;
-    }
-
-    // Word count and calorie cost logic
-    const textInput = document.getElementById("textInput");
-    const wordCountDisplay = document.getElementById("wordCount");
-    const calorieCostDisplay = document.getElementById("calorieCost");
-
-    function getWordCount(str) {
-      const words = str.split(" ");
-      let count = 0;
-      for (let word of words) {
-        if ([...word].some(ch => /\w/.test(ch))) {
-          count++;
-        }
-      }
-      return count;
-    }
-
-    function getCalorieCost(str) {
-      let cost = 0;
-      for (let ch of str) {
-        cost += glyphData[ch] || 0;
-      }
-      return cost;
-    }
-
-    textInput.addEventListener("input", () => {
-      const text = textInput.value;
-      wordCountDisplay.textContent = getWordCount(text);
-      calorieCostDisplay.textContent = getCalorieCost(text);
+    Object.keys(data).forEach(key => {
+      if (key === "prompt") return;
+      const option = document.createElement("option");
+      option.value = key;
+      option.textContent = key;
+      select.appendChild(option);
     });
+
+    // Display first user info by default
+    const firstUser = select.options[0]?.value;
+    if (firstUser) {
+      displayUserInfo(data[firstUser]);
+    }
+
+    select.addEventListener("change", () => {
+      const selectedUser = select.value;
+      displayUserInfo(data[selectedUser]);
+    });
+  }
+
+  function displayUserInfo(info) {
+    if (!info || !userInfoContainer) {
+      console.warn("User info or container missing.");
+      return;
+    }
+
+    let html = `
+      <p><strong>Health:</strong> ${info.health}</p>
+      <p><strong>Stomach:</strong> ${info.stomach}</p>
+      <p><strong>Capacity:</strong> ${info.capacity}</p>
+      <p><strong>Rank:</strong> ${info.rank}</p>
+      <p><strong>Food Inventory:</strong></p>
+      <ul>
+    `;
+
+    for (let key in info.food) {
+      const item = info.food[key];
+      html += `<li>${item.name} (${item.food}) — Mass: ${item.mass}, Expired: ${item.expired}</li>`;
+    }
+
+    html += `</ul>`;
+    userInfoContainer.innerHTML = html;
+  }
+
+  function displayPrompt(promptText) {
+    if (!promptContainer) return;
+    promptContainer.innerHTML = `<p><strong>Prompt:</strong> ${promptText}</p>`;
+  }
+
+  function getWordCount(str) {
+    const words = str.split(" ");
+    let count = 0;
+    for (let word of words) {
+      if ([...word].some(ch => /\w/.test(ch))) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  function getCalorieCost(str) {
+    let cost = 0;
+    for (let ch of str) {
+      cost += glyphData[ch] || 0;
+    }
+    return cost;
+  }
+
+  textInput.addEventListener("input", () => {
+    const text = textInput.value;
+    wordCountDisplay.textContent = getWordCount(text);
+    calorieCostDisplay.textContent = getCalorieCost(text);
   });
+});
 </script>
+
 
 
 
