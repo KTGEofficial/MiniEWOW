@@ -87,7 +87,6 @@ function updateHealthBar(value, max) {
 
   fill.style.width = pct + "%";
   fill.style.backgroundColor = interpolateColor(value, max);
-  text.textContent = `${value} / ${max}`;
 }
 
   document.addEventListener("DOMContentLoaded", () => {
