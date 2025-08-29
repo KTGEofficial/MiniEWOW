@@ -46,25 +46,25 @@ console.log(data);
 
     function populateUserDropdown(data) {
   const select = document.getElementById("userSelect");
+  select.innerHTML = "";        // clear any old options
 
-  // If data is an array, flatten it into a single object
-  if (Array.isArray(data)) {
-    data = Object.assign({}, ...data);
-  }
-
-  for (let username in data) {
-    if (username === "prompt") continue;
+  Object.keys(data).forEach(key => {
+    if (key === "prompt") return;
     const option = document.createElement("option");
-    option.value = username;
-    option.textContent = username;
+    option.value = key;
+    option.textContent = key;
     select.appendChild(option);
-  }
+  });
+
+  // Immediately display the first user’s info if you like
+  const firstUser = select.options[0]?.value;
+  if (firstUser) displayUserInfo(data[firstUser]);
 
   select.addEventListener("change", () => {
-    const selectedUser = select.value;
-    displayUserInfo(mapdosData[selectedUser]);
+    displayUserInfo(data[select.value]);
   });
 }
+
 
     function displayUserInfo(info) {
       const container = document.getElementById("userInfo");
