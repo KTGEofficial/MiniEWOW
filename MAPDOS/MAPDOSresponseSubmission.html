@@ -66,13 +66,6 @@ console.log(data);
   });
 }
 
-
-      select.addEventListener("change", () => {
-        const selectedUser = select.value;
-        displayUserInfo(mapdosData[selectedUser]);
-      });
-    }
-
     function displayUserInfo(info) {
       const container = document.getElementById("userInfo");
       if (!info) return;
