@@ -1,201 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>MAPDOS Response Submission</title>
-  <style>
-    body { font-family: sans-serif; padding: 2em; background: #fdf6e3; color: #333; }
-    textarea { width: 100%; height: 150px; font-size: 1.2em; margin-bottom: 1em; }
-    .output { font-size: 1.1em; margin-top: 1em; }
-    .label { font-weight: bold; }.health-bar-container {
-  width: 300px;
-  height: 30px;
-  background-color: #333;
-  border-radius: 15px;
-  overflow: hidden;
-  position: relative;
-  margin-bottom: 1em;
-  box-shadow: inset 0 0 5px #000;
-}
-
-.health-bar-fill {
-  height: 100%;
-  width: 0%;
-  background-color: #fe467c; /* default */
-  transition: width 0.3s ease, background-color 0.3s ease;
-  border-radius: 15px 0 0 15px;
-}
-
-.health-bar-text {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: monospace;
-  font-weight: bold;
-  color: white;
-  pointer-events: none;
-}
-
-  </style>
+  <meta charset="UTF-8">
+  <title>MAPDOS Response Submission</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2em;
+      background: #fdf6e3;
+      color: #333;
+    }
+    select, input {
+      font-size: 1.1em;
+      margin-bottom: 1em;
+    }
+    #healthBar {
+      width: 100%;
+      height: 20px;
+      background-color: #eee;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 1em;
+    }
+    #healthFill {
+      height: 100%;
+      background-color: #4caf50;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .output {
+      font-size: 1.1em;
+      margin-top: 1em;
+    }
+    .label {
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <h1>MAPDOS Response Submission</h1><p>Choose your contestant</p>
-<select id="userSelect"></select>
+  <h1>MAPDOS Response Submission</h1>
+  <p>Choose your contestant:</p>
+  <select id="userSelect"></select>
 
-<div id="userInfo"></div><p>Prompt:</p>
-<div id="promptDisplay"></div>
+  <div id="promptDisplay"></div>
 
-  <input id="textInput" placeholder="Type your response here..." type="text">
-  <div class="output">
-    <div><span class="label">Word Count:</span> <span id="wordCount">0</span></div>
-    <div><span class="label">Calorie Cost:</span> <span id="calorieCost">0</span></div>
-  </div>
-<script>function interpolateColor(value, max) {
-  const pct = value / max;
+  <div id="healthBar"><div id="healthFill"></div></div>
 
-  const colorStops = [
-    { pct: 0.0, color: [254, 70, 124] },   // #fe467c
-    { pct: 0.5, color: [255, 255, 128] },  // #ffff80
-    { pct: 1.0, color: [0, 255, 128] }     // #00ff80
-  ];
+  <div id="userInfo"></div>
 
-  let lower = colorStops[0], upper = colorStops[2];
-  for (let i = 1; i < colorStops.length; i++) {
-    if (pct <= colorStops[i].pct) {
-      upper = colorStops[i];
-      lower = colorStops[i - 1];
-      break;
-    }
-  }
+  <input id="textInput" placeholder="Type your response here..." type="text">
+  <div class="output">
+    <div><span class="label">Word Count:</span> <span id="wordCount">0</span></div>
+    <div><span class="label">Calorie Cost:</span> <span id="calorieCost">0</span></div>
+  </div>
 
-  const range = upper.pct - lower.pct;
-  const rangePct = (pct - lower.pct) / range;
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      let glyphData = {};
+      let mapdosData = {};
 
-  const interpolated = lower.color.map((c, i) =>
-    Math.round(c + (upper.color[i] - c) * rangePct)
-  );
+      const select = document.getElementById("userSelect");
+      const userInfoContainer = document.getElementById("userInfo");
+      const promptContainer = document.getElementById("promptDisplay");
+      const healthFill = document.getElementById("healthFill");
+      const textInput = document.getElementById("textInput");
+      const wordCountDisplay = document.getElementById("wordCount");
+      const calorieCostDisplay = document.getElementById("calorieCost");
 
-  return `rgb(${interpolated.join(",")})`;
-}
+      // Load glyph density JSON
+      fetch("https://ktgeofficial.github.io/MiniEWOW/MAPDOS/MAPDOSfontProportions.json")
+        .then(response => response.json())
+        .then(data => {
+          glyphData = data;
+        });
 
-function updateHealthBar(value, max) {
-  const fill = document.getElementById("healthFill");
-  const text = document.getElementById("healthText");
-  const pct = (value / max) * 100;
+      // Load MAPDOS JSON from Apps Script
+      fetch("https://script.google.com/macros/s/AKfycbw1iY86evimRga_XhGddO2AlQyb63srbFsSeC-31RGc5FmKir9-EyG7tUIs6PS8MDai/exec?mode=submissions")
+        .then(response => response.json())
+        .then(data => {
+          mapdosData = data;
+          populateUserDropdown(data);
+          displayPrompt(data.prompt);
+        });
 
-  fill.style.width = pct + "%";
-  fill.style.backgroundColor = interpolateColor(value, max);
-}
+      function populateUserDropdown(data) {
+        select.innerHTML = "";
 
-  document.addEventListener("DOMContentLoaded", () => {
-    let glyphData = {};
-    let mapdosData = {};
+        Object.keys(data).forEach(key => {
+          if (key === "prompt") return;
+          const option = document.createElement("option");
+          option.value = key;
+          option.textContent = key;
+          select.appendChild(option);
+        });
 
-    // Load glyph density JSON
-    fetch("https://ktgeofficial.github.io/MiniEWOW/MAPDOS/MAPDOSfontProportions.json")
-      .then(response => response.json())
-      .then(data => {
-        glyphData = data;
-      });
+        const firstUser = select.options[0]?.value;
+        if (firstUser) {
+          displayUserInfo(data[firstUser]);
+        }
 
-    // Load MAPDOS JSON from Apps Script
-    fetch("https://script.google.com/macros/s/AKfycbwyJSWWQCo3bZZQ7dahPebxZFsNY_mZN0n9SEIbrHTs-_GTv2hPzm9vJrkHLvgBDOF3/exec?mode=submissions")
-      .then(response => response.json())
-      .then(data => {
-        mapdosData = data;
-console.log(data);
-        populateUserDropdown(data);
-        displayPrompt(data.prompt);
-      });
+        select.addEventListener("change", () => {
+          displayUserInfo(data[select.value]);
+        });
+      }
 
-    function populateUserDropdown(data) {
-  const select = document.getElementById("userSelect");
-  select.innerHTML = "";        // clear any old options
+      function displayUserInfo(info) {
+        if (!info) return;
 
-  Object.keys(data).forEach(key => {
-    if (key === "prompt") return;
-    const option = document.createElement("option");
-    option.value = key;
-    option.textContent = key;
-    select.appendChild(option);
-  });
+        // Update health bar
+        const healthPercent = Math.min(100, Math.max(0, info.health));
+        healthFill.style.width = healthPercent + "%";
 
-  // Immediately display the first user’s info if you like
-  const firstUser = select.options[0]?.value;
-  if (firstUser) displayUserInfo(data[firstUser]);
+        // Display other info
+        let html = `
+          <p><strong>Stomach:</strong> ${info.stomach}</p>
+          <p><strong>Capacity:</strong> ${info.capacity}</p>
+          <p><strong>Rank:</strong> ${info.rank}</p>
+          <p><strong>Food Inventory:</strong></p>
+          <ul>
+        `;
 
-  select.addEventListener("change", () => {
-    displayUserInfo(data[select.value]);
-  });
-}
+        for (let key in info.food) {
+          const item = info.food[key];
+          html += `<li>${item.name} (${item.food}) — Mass: ${item.mass}, Expired: ${item.expired}</li>`;
+        }
 
+        html += `</ul>`;
+        userInfoContainer.innerHTML = html;
+      }
 
-    function displayUserInfo(info) {
-      const container = document.getElementById("userInfo");
-      if (!info) return;
+      function displayPrompt(promptText) {
+        promptContainer.innerHTML = `<p><strong>Prompt:</strong> ${promptText}</p>`;
+      }
 
-      let html = `
-        <div class="health-bar-container">
-  <div class="health-bar-fill" id="healthFill"></div>
-</div>
+      function getWordCount(str) {
+        const words = str.split(" ");
+        let count = 0;
+        for (let word of words) {
+          if ([...word].some(ch => /\w/.test(ch))) {
+            count++;
+          }
+        }
+        return count;
+      }
 
-        <p><strong>Stomach:</strong> ${info.stomach}</p>
-        <p><strong>Capacity:</strong> ${info.capacity}</p>
-        <p><strong>Rank:</strong> ${info.rank}</p>
-        <p><strong>Food Inventory:</strong></p>
-        <ul>
-      `;
+      function getCalorieCost(str) {
+        let cost = 0;
+        for (let ch of str) {
+          cost += glyphData[ch] || 0;
+        }
+        return cost;
+      }
 
-      for (let key in info.food) {
-        const item = info.food[key];
-        html += `<li>${item.name} (${item.food}) — Mass: ${item.mass}, Expired: ${item.expired}</li>`;
-      }
-
-      html += `</ul>`;
-      container.innerHTML = html;updateHealthBar(info.health, 99);
-
-    }
-
-    function displayPrompt(promptText) {
-      const promptContainer = document.getElementById("promptDisplay");
-      promptContainer.innerHTML = `<p><strong>Prompt:</strong> ${promptText}</p>`;
-    }
-
-    // Word count and calorie cost logic
-    const textInput = document.getElementById("textInput");
-    const wordCountDisplay = document.getElementById("wordCount");
-    const calorieCostDisplay = document.getElementById("calorieCost");
-
-    function getWordCount(str) {
-      const words = str.split(" ");
-      let count = 0;
-      for (let word of words) {
-        if ([...word].some(ch => /\w/.test(ch))) {
-          count++;
-        }
-      }
-      return count;
-    }
-
-    function getCalorieCost(str) {
-      let cost = 0;
-      for (let ch of str) {
-        cost += glyphData[ch] || 0;
-      }
-      return cost;
-    }
-
-    textInput.addEventListener("input", () => {
-      const text = textInput.value;
-      wordCountDisplay.textContent = getWordCount(text);
-      calorieCostDisplay.textContent = getCalorieCost(text);
-    });
-  });
-</script>
-
-
-
+      textInput.addEventListener("input", () => {
+        const text = textInput.value;
+        wordCountDisplay.textContent = getWordCount(text);
+        calorieCostDisplay.textContent = getCalorieCost(text);
+      });
+    });
+  </script>
 </body>
 </html>
