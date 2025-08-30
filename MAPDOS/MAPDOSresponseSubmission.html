@@ -109,7 +109,7 @@
 
         // Update health bar
         const healthPercent = Math.min(100, Math.max(0, info.health));
-        healthFill.style.width = healthPercent + "%";
+        healthFill.style.width = (healthPercent * (100 / 99)) + "%";
 
         // Display other info
         let html = `
