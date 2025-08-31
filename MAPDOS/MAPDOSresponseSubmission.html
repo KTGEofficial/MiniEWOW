@@ -81,7 +81,7 @@
 
       <!-- Outline -->
       <path d="M 56 0 H 72 V 12 C 128 12 128 116 72 116 H 40 V 128 H 24 V 104 C 24 104 84 96 56 12 V 0 Z"
-            fill="none" stroke="black" stroke-width="4"/>
+            fill="none" stroke="white" stroke-width="4"/>
 
       <!-- Green (current stomach fill) -->
       <rect id="greenFill" x="0" y="128" width="128" height="0"
@@ -323,11 +323,11 @@
     // --- submission handler ---
     function submitResponse() {
       let contestant;
-      let foodid = -1;
+      let foodid = null;
 
       if (userSelect.value === "custom") {
         contestant = customNameInput.value.trim() || "Anonymous Filler";
-        foodid = -1; // force none for filler
+        foodid = null; // force none for filler
       } else {
         contestant = userSelect.value;
         if (!foodSelect.disabled && foodSelect.value !== "none") {
