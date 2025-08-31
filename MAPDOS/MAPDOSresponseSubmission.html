@@ -72,32 +72,31 @@
 
       <!-- Outline -->
       <path d="M 56 0 H 72 V 12 C 128 12 128 116 72 116 H 40 V 128 H 24 V 104 C 24 104 84 96 56 12 V 0 Z"
-            fill="none" stroke="#444" stroke-width="4"/>
+            fill="none" stroke="black" stroke-width="4"/>
 
       <!-- Green (current stomach fill) -->
       <rect id="greenFill" x="0" y="128" width="128" height="0"
-            fill="#00ff88" clip-path="url(#vesselClip)" />
+            fill="#00FF80" clip-path="url(#vesselClip)" />
 
       <!-- Yellow (selected food preview) -->
       <rect id="yellowFill" x="0" y="128" width="128" height="0"
-            fill="#ffff55" clip-path="url(#vesselClip)" />
+            fill="#FFFF80" clip-path="url(#vesselClip)" />
 
       <!-- Red (overflow) -->
       <rect id="overflowFill" x="0" y="128" width="128" height="0"
-            fill="#ff4444" clip-path="url(#vesselClip)" />
+            fill="#FE467C" clip-path="url(#vesselClip)" />
     </svg>
   </div>
 
   <!-- Food selection -->
   <p><strong>Choose food to eat:</strong></p>
   <select id="foodSelect"></select>
-  <div id="stomachImpact" style="margin-top: 0.5em; font-style: italic;"></div>
 
   <!-- Text response and metrics -->
   <input id="textInput" placeholder="Type your response here..." type="text" />
   <div class="output">
     <div><span class="label">Word Count:</span> <span id="wordCount">0</span></div>
-    <div><span class="label">Calorie Cost:</span> <span id="calorieCost">0</span></div>
+    <div><span class="label">Energy Cost:</span> <span id="calorieCost">0</span></div>
   </div>
 
   <!-- Hidden inputs to power the SVG logic -->
@@ -117,7 +116,6 @@
       const healthFill = document.getElementById("healthFill");
 
       const foodSelect = document.getElementById("foodSelect");
-      const stomachImpact = document.getElementById("stomachImpact");
 
       const textInput = document.getElementById("textInput");
       const wordCountDisplay = document.getElementById("wordCount");
@@ -207,11 +205,9 @@
         foodSelect.onchange = () => {
           const sel = foodSelect.value;
           if (sel === "none") {
-            stomachImpact.textContent = "No food selected.";
             yellowInput.value = 0;
           } else {
             const itm = info.food[sel];
-            stomachImpact.textContent = `Eating this will add ${itm.mass} to stomach.`;
             yellowInput.value = itm.mass;
           }
           updateStomachSVG();
