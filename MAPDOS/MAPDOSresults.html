@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Leaderboard & Food Ritual</title>
+  <style>
+    /* Your stylized CSS */
+    body {
+      font-family: sans-serif;
+      padding: 2em;
+      background: repeating-linear-gradient(
+        315deg,
+        #9F5148,
+        #9F5148 20px,
+        #584238 20px,
+        #584238 40px
+      );
+      color: white;
+      text-align: center;
+    }
+
+    select, input {
+      font-size: 1.1em;
+      margin-bottom: 1em;
+    }
+
+    input[type="text"] {
+      width: 50%;
+      background-color: #584238;
+      color: white;
+      border: none;
+      outline: 4px solid #9F5148;
+      border-radius: 1rem;
+      padding: 0.5em 1em;
+      font-size: 1em;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    input[type="text"]::placeholder {
+      color: #BFFFFF;
+      opacity: 1;
+    }
+
+    button {
+      border-radius: 1rem;
+      background-color: #FE467C;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #FFFF80;
+      color: white;
+    }
+
+    button:active {
+      background-color: #00FF80;
+      color: white;
+    }
+
+    select {
+      background-color: #584238;
+      color: white;
+      border: none;
+      outline: 4px solid #9F5148;
+      border-radius: 1rem;
+      padding: 0.5em 1em;
+      font-size: 1em;
+      appearance: none;
+      cursor: pointer;
+      text-align: center;
+      text-align-last: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2em;
+    }
+
+    th, td {
+      padding: 0.5em;
+      border-bottom: 1px solid #9F5148;
+    }
+
+    th {
+      font-weight: bold;
+    }
+
+    .morefood {
+      background-color: #00FF80;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Leaderboard</h2>
+<table id="leaderboard">
+  <thead>
+    <tr>
+      <th>Rank</th>
+      <th>Username</th>
+      <th>Response</th>
+      <th>Percentile</th>
+      <th>StDev</th>
+      <th>Skew</th>
+      <th>RankCount</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<div>
+  <label class="label">Select Contestant:</label><br>
+  <select id="contestantSelect" onchange="handleContestantChange()">
+    <option value="">-- Choose --</option>
+  </select>
+</div>
+
+<div id="foodSelectContainer" style="display:none;">
+  <label class="label">Select Food:</label><br>
+  <select id="foodSelect">
+    <option value="">-- Choose Food --</option>
+  </select>
+</div>
+
+<button onclick="submitFood()">Submit Food</button>
+
+<script>
+  const macroURL = "https://script.google.com/macros/s/AKfycbx4uqAyNCs7YRdS-LCzh7rA3HJg3JLEcC4XxDKFdNnXGF8VkjEvV8xRmZjcN2HMAtrs/exec?mode=results";
+  let results = [];
+  let foodOptions = [];
+
+  function toOrdinal(n) {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  }
+
+  async function loadData() {
+    const res = await fetch(macroURL);
+    const data = await res.json();
+    results = data.results;
+    foodOptions = data.food;
+
+    const tbody = document.querySelector("#leaderboard tbody");
+    const usernames = new Set();
+
+    results.forEach(entry => {
+      const tr = document.createElement("tr");
+      if (entry.MoreFood === true || entry.MoreFood === "TRUE") {
+        tr.classList.add("morefood");
+      }
+
+      tr.innerHTML = `
+        <td>${toOrdinal(entry.Rank)}</td>
+        <td>${entry.Username}</td>
+        <td>${entry.Response}</td>
+        <td>${entry.Percentile}</td>
+        <td>${entry.StDev}</td>
+        <td>${entry.Skew}</td>
+        <td>${entry.RankCount}</td>
+      `;
+      tbody.appendChild(tr);
+      usernames.add(entry.Username);
+    });
+
+    const select = document.getElementById("contestantSelect");
+    usernames.forEach(name => {
+      const option = document.createElement("option");
+      option.value = name;
+      option.textContent = name;
+      select.appendChild(option);
+    });
+
+    const foodSelect = document.getElementById("foodSelect");
+    foodOptions.forEach(food => {
+      const option = document.createElement("option");
+      option.value = food.FoodID;
+      option.textContent = food.FoodName;
+      foodSelect.appendChild(option);
+    });
+  }
+
+  function handleContestantChange() {
+    const selected = document.getElementById("contestantSelect").value;
+    const hasMoreFood = results.some(r => r.Username === selected && (r.MoreFood === true || r.MoreFood === "TRUE"));
+    document.getElementById("foodSelectContainer").style.display = hasMoreFood ? "block" : "none";
+  }
+
+  function submitFood() {
+    const name = document.getElementById("contestantSelect").value;
+    const foodID = document.getElementById("foodSelect").value;
+    if (!name) return alert("Please select a contestant.");
+    if (document.getElementById("foodSelectContainer").style.display !== "none" && !foodID) {
+      return alert("Please select a food.");
+    }
+
+    alert(`Food request submitted for ${name}${foodID ? " with food: " + foodID : ""}`);
+    // You can add fetch logic here to send to macro if needed
+  }
+
+  loadData();
+</script>
+
+</body>
+</html>
