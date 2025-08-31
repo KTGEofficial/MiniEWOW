@@ -45,8 +45,10 @@
   border-radius: 1rem;
   background-color: #584238;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
+/* Flat yellow top band behind text */
 .response::before {
   content: "";
   position: absolute;
@@ -58,11 +60,11 @@
   z-index: 0;
 }
 
+/* Ensure text and content sit above the yellow band */
 .response > * {
   position: relative;
   z-index: 1;
 }
-
 
 
     input[type="text"] {
