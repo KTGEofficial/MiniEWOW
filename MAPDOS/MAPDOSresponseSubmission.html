@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>MAPDOS Response Submission – Stomach Preview</title>
+  <title>MAPDOS Response Submission</title>
   <style>
     body {
       font-family: sans-serif;
@@ -26,7 +26,6 @@
       height: 100%;
       background-color: #4caf50;
       width: 0%;
-      transition: width 0.3s ease;
     }
     .output {
       font-size: 1.1em;
@@ -107,149 +106,205 @@
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      let glyphData = {};
-      let mapdosData = {};
+  document.addEventListener("DOMContentLoaded", () => {
+    let glyphData = {};
+    let mapdosData = {};
 
-      const userSelect = document.getElementById("userSelect");
-      const promptDisplay = document.getElementById("promptDisplay");
-      const healthFill = document.getElementById("healthFill");
+    const userSelect = document.getElementById("userSelect");
+    const promptDisplay = document.getElementById("promptDisplay");
+    const healthFill = document.getElementById("healthFill");
 
-      const foodSelect = document.getElementById("foodSelect");
+    const foodSelect = document.getElementById("foodSelect");
+    const textInput = document.getElementById("textInput");
+    const wordCountDisplay = document.getElementById("wordCount");
+    const calorieCostDisplay = document.getElementById("calorieCost");
 
-      const textInput = document.getElementById("textInput");
-      const wordCountDisplay = document.getElementById("wordCount");
-      const calorieCostDisplay = document.getElementById("calorieCost");
+    // SVG stomach bits
+    const capacityInput = document.getElementById("capacity");
+    const greenInput = document.getElementById("green");
+    const yellowInput = document.getElementById("yellow");
+    const greenFillRect = document.getElementById("greenFill");
+    const yellowFillRect = document.getElementById("yellowFill");
+    const overflowFillRect = document.getElementById("overflowFill");
 
-      // SVG fill elements and inputs
-      const capacityInput = document.getElementById("capacity");
-      const greenInput = document.getElementById("green");
-      const yellowInput = document.getElementById("yellow");
-      const greenFillRect = document.getElementById("greenFill");
-      const yellowFillRect = document.getElementById("yellowFill");
-      const overflowFillRect = document.getElementById("overflowFill");
+    // Load glyph density JSON
+    fetch("https://ktgeofficial.github.io/MiniEWOW/MAPDOS/MAPDOSfontProportions.json")
+      .then(res => res.json())
+      .then(data => glyphData = data);
 
-      // Load glyph density JSON
-      fetch("https://ktgeofficial.github.io/MiniEWOW/MAPDOS/MAPDOSfontProportions.json")
-        .then(res => res.json())
-        .then(data => glyphData = data);
-
-      // Load MAPDOS data
-      fetch("https://script.google.com/macros/s/AKfycbw1iY86evimRga_XhGddO2AlQyb63srbFsSeC-31RGc5FmKir9-EyG7tUIs6PS8MDai/exec?mode=submissions")
-        .then(res => res.json())
-        .then(data => {
-          mapdosData = data;
-          buildUserSelect(data);
-          displayPrompt(data.prompt);
-        });
-
-      function buildUserSelect(data) {
-        userSelect.innerHTML = "";
-        Object.keys(data).forEach(key => {
-          if (key === "prompt") return;
-          const opt = document.createElement("option");
-          opt.value = key;
-          opt.textContent = key;
-          userSelect.appendChild(opt);
-        });
-        if (userSelect.options.length) {
-          displayUserState(mapdosData[userSelect.value]);
-        }
-        userSelect.addEventListener("change", () => {
-          displayUserState(mapdosData[userSelect.value]);
-        });
-      }
-
-      function displayPrompt(text) {
-        promptDisplay.innerHTML = `<p><strong>Prompt:</strong> ${text}</p>`;
-      }
-
-      function displayUserState(info) {
-        // Health bar
-        const pct = Math.min(100, Math.max(0, info.health));
-        healthFill.style.width = (pct * (100 / 99)) + "%";
-
-        // Populate food dropdown
-        foodSelect.innerHTML = "";
-        const keys = Object.keys(info.food);
-
-        if (keys.length) {
-          const noneOpt = document.createElement("option");
-          noneOpt.value = "none";
-          noneOpt.textContent = "Do not eat any food";
-          foodSelect.appendChild(noneOpt);
-
-          keys.forEach(k => {
-            const item = info.food[k];
-            const o = document.createElement("option");
-            o.value = k;
-            o.id = `food-${k}`;
-            o.textContent = item.name + (item.expired ? " (EXPIRED)" : "");
-            foodSelect.appendChild(o);
-          });
-          foodSelect.disabled = false;
-        } else {
-          const noOpt = document.createElement("option");
-          noOpt.textContent = "No food available";
-          noOpt.disabled = true;
-          foodSelect.appendChild(noOpt);
-          foodSelect.disabled = true;
-        }
-
-        // Initialize stomach inputs
-        capacityInput.value = info.capacity;
-        greenInput.value = info.stomach;
-        yellowInput.value = 0;
-        updateStomachSVG();
-
-        foodSelect.onchange = () => {
-          const sel = foodSelect.value;
-          if (sel === "none") {
-            yellowInput.value = 0;
-          } else {
-            const itm = info.food[sel];
-            yellowInput.value = itm.mass;
-          }
-          updateStomachSVG();
-        };
-      }
-
-      function updateStomachSVG() {
-        const cap = parseFloat(capacityInput.value) || 1;
-        const gr = parseFloat(greenInput.value) || 0;
-        const yl = parseFloat(yellowInput.value) || 0;
-        const total = gr + yl;
-        const maxH = 128;
-
-        if (total <= cap) {
-          const gh = (gr / cap) * maxH;
-          const yh = (yl / cap) * maxH;
-          greenFillRect.setAttribute("height", gh);
-          greenFillRect.setAttribute("y", maxH - gh);
-          yellowFillRect.setAttribute("height", yh);
-          yellowFillRect.setAttribute("y", maxH - gh - yh);
-          overflowFillRect.setAttribute("height", 0);
-        } else {
-          greenFillRect.setAttribute("height", 0);
-          yellowFillRect.setAttribute("height", 0);
-          overflowFillRect.setAttribute("height", maxH);
-          overflowFillRect.setAttribute("y", 0);
-        }
-      }
-
-      function getWordCount(s) {
-        return s.split(" ").filter(w => [...w].some(ch => /\w/.test(ch))).length;
-      }
-
-      function getCalorieCost(s) {
-        return [...s].reduce((sum, c) => sum + (glyphData[c] || 0), 0);
-      }
-
-      textInput.addEventListener("input", () => {
-        wordCountDisplay.textContent = getWordCount(textInput.value);
-        calorieCostDisplay.textContent = getCalorieCost(textInput.value);
+    // Load MAPDOS data
+    fetch("https://script.google.com/macros/s/AKfycbw1iY86evimRga_XhGddO2AlQyb63srbFsSeC-31RGc5FmKir9-EyG7tUIs6PS8MDai/exec?mode=submissions")
+      .then(res => res.json())
+      .then(data => {
+        mapdosData = data;
+        buildUserSelect(data);
+        displayPrompt(data.prompt);
       });
+
+    // --- Color interpolation helpers ---
+    function hexToRgb(hex) {
+      hex = hex.replace("#", "");
+      if (hex.length === 3) hex = hex.split("").map(c => c + c).join("");
+      const bigint = parseInt(hex, 16);
+      return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+    }
+
+    function rgbToHex([r, g, b]) {
+      return "#" + [r, g, b].map(x => x.toString(16).padStart(2, "0")).join("");
+    }
+
+    function lerpColor(color1, color2, t) {
+      return color1.map((c, i) => Math.round(c + (color2[i] - c) * t));
+    }
+
+    // health = 0 → red, 50 → yellow, 100 → green
+    function getHealthColor(pct) {
+      const red = hexToRgb("#FE467C");
+      const yellow = hexToRgb("#FFFF80");
+      const green = hexToRgb("#00FF80");
+
+      if (pct <= 50) {
+        const t = pct / 50; // 0 → 50% range
+        return rgbToHex(lerpColor(red, yellow, t));
+      } else {
+        const t = (pct - 50) / 50; // 50 → 100% range
+        return rgbToHex(lerpColor(yellow, green, t));
+      }
+    }
+
+    // --- UI builders ---
+    function buildUserSelect(data) {
+      userSelect.innerHTML = "";
+
+      // Extra option to pick your own contestant name
+      const customOpt = document.createElement("option");
+      customOpt.value = "custom";
+      customOpt.textContent = "Choose your own contestant name";
+      userSelect.appendChild(customOpt);
+
+      Object.keys(data).forEach(key => {
+        if (key === "prompt") return;
+        const opt = document.createElement("option");
+        opt.value = key;
+        opt.textContent = key;
+        userSelect.appendChild(opt);
+      });
+
+      if (userSelect.options.length) {
+        if (userSelect.value !== "custom") {
+          displayUserState(mapdosData[userSelect.value]);
+        }
+      }
+
+      userSelect.addEventListener("change", () => {
+        if (userSelect.value === "custom") {
+          const name = prompt("Enter your contestant name:");
+          if (name) {
+            const opt = document.createElement("option");
+            opt.value = name;
+            opt.textContent = name;
+            userSelect.appendChild(opt);
+            userSelect.value = name;
+            // Give them full health if new
+            displayUserState({ health: 100, capacity: 100, stomach: 0, food: {} });
+          }
+        } else {
+          displayUserState(mapdosData[userSelect.value]);
+        }
+      });
+    }
+
+    function displayPrompt(text) {
+      promptDisplay.innerHTML = `<p><strong>Prompt:</strong> ${text}</p>`;
+    }
+
+    function displayUserState(info) {
+      const pct = Math.min(100, Math.max(0, info.health));
+      healthFill.style.width = (pct * (100 / 99)) + "%";
+      healthFill.style.backgroundColor = getHealthColor(pct);
+
+      // Food dropdown
+      foodSelect.innerHTML = "";
+      const keys = Object.keys(info.food || {});
+
+      if (keys.length) {
+        const noneOpt = document.createElement("option");
+        noneOpt.value = "none";
+        noneOpt.textContent = "Do not eat any food";
+        foodSelect.appendChild(noneOpt);
+
+        keys.forEach(k => {
+          const item = info.food[k];
+          const o = document.createElement("option");
+          o.value = k;
+          o.id = `food-${k}`;
+          o.textContent = item.name + (item.expired ? " (EXPIRED)" : "");
+          foodSelect.appendChild(o);
+        });
+        foodSelect.disabled = false;
+      } else {
+        const noOpt = document.createElement("option");
+        noOpt.textContent = "No food available";
+        noOpt.disabled = true;
+        foodSelect.appendChild(noOpt);
+        foodSelect.disabled = true;
+      }
+
+      // stomach setup
+      capacityInput.value = info.capacity;
+      greenInput.value = info.stomach;
+      yellowInput.value = 0;
+      updateStomachSVG();
+
+      foodSelect.onchange = () => {
+        const sel = foodSelect.value;
+        if (sel === "none") {
+          yellowInput.value = 0;
+        } else {
+          const itm = info.food[sel];
+          yellowInput.value = itm.mass;
+        }
+        updateStomachSVG();
+      };
+    }
+
+    function updateStomachSVG() {
+      const cap = parseFloat(capacityInput.value) || 1;
+      const gr = parseFloat(greenInput.value) || 0;
+      const yl = parseFloat(yellowInput.value) || 0;
+      const total = gr + yl;
+      const maxH = 128;
+
+      if (total <= cap) {
+        const gh = (gr / cap) * maxH;
+        const yh = (yl / cap) * maxH;
+        greenFillRect.setAttribute("height", gh);
+        greenFillRect.setAttribute("y", maxH - gh);
+        yellowFillRect.setAttribute("height", yh);
+        yellowFillRect.setAttribute("y", maxH - gh - yh);
+        overflowFillRect.setAttribute("height", 0);
+      } else {
+        greenFillRect.setAttribute("height", 0);
+        yellowFillRect.setAttribute("height", 0);
+        overflowFillRect.setAttribute("height", maxH);
+        overflowFillRect.setAttribute("y", 0);
+      }
+    }
+
+    // text metrics
+    function getWordCount(s) {
+      return s.split(" ").filter(w => [...w].some(ch => /\w/.test(ch))).length;
+    }
+
+    function getCalorieCost(s) {
+      return [...s].reduce((sum, c) => sum + (glyphData[c] || 0), 0);
+    }
+
+    textInput.addEventListener("input", () => {
+      wordCountDisplay.textContent = getWordCount(textInput.value);
+      calorieCostDisplay.textContent = getCalorieCost(textInput.value);
     });
-  </script>
+  });
+</script>
 </body>
 </html>
