@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MAPDOS Response Ranker</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    #prompt { font-weight: bold; font-size: 1.2em; margin-bottom: 10px; }
+    #canvas { border: 1px solid #ccc; padding: 10px; min-height: 300px; background: #f9f9f9; }
+    .response { padding: 8px; margin: 5px 0; background: #fff; border: 1px solid #aaa; cursor: move; }
+    #controls { margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+<div id="prompt">Loading prompt...</div>
+<div id="canvas"></div>
+
+<div id="controls">
+  <input type="text" id="voterName" placeholder="Enter your name" />
+  <button onclick="submitVote()">Submit Vote</button>
+</div>
+
+<script>
+  const macroURL = "https://script.google.com/macros/s/AKfycbx4uqAyNCs7YRdS-LCzh7rA3HJg3JLEcC4XxDKFdNnXGF8VkjEvV8xRmZjcN2HMAtrs/exec?mode=votes";
+  const canvas = document.getElementById("canvas");
+  const promptDiv = document.getElementById("prompt");
+  let responseMap = {}; // letter → response
+  let responseOrder = []; // current order of letters
+
+  function getWordCount(s) {
+    return s.split(" ").filter(w => [...w].some(ch => /\w/.test(ch))).length;
+  }
+
+  async function loadResponses() {
+    const res = await fetch(macroURL);
+    const data = await res.json();
+    promptDiv.textContent = data.prompt || "Prompt not found";
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (key === "prompt") return;
+      responseMap[key] = value;
+      responseOrder.push(key);
+
+      const div = document.createElement("div");
+      div.className = "response";
+      div.draggable = true;
+      div.textContent = `${value} (${getWordCount(value)} words)`;
+      div.dataset.letter = key;
+
+      div.addEventListener("dragstart", e => {
+        e.dataTransfer.setData("text/plain", e.target.dataset.letter);
+      });
+
+      canvas.appendChild(div);
+    });
+
+    canvas.addEventListener("dragover", e => e.preventDefault());
+    canvas.addEventListener("drop", e => {
+      e.preventDefault();
+      const draggedLetter = e.dataTransfer.getData("text/plain");
+      const draggedElem = [...canvas.children].find(el => el.dataset.letter === draggedLetter);
+      const dropTarget = e.target.closest(".response");
+      if (dropTarget && dropTarget !== draggedElem) {
+        canvas.insertBefore(draggedElem, dropTarget);
+      }
+    });
+  }
+
+  function submitVote() {
+    const name = document.getElementById("voterName").value.trim();
+    if (!name) return alert("Please enter your name.");
+
+    const orderedLetters = [...canvas.children].map(el => el.dataset.letter);
+    const voteString = `[MEGA ${orderedLetters.join("")}]`;
+
+    fetch("https://script.google.com/macros/s/AKfycbx4uqAyNCs7YRdS-LCzh7rA3HJg3JLEcC4XxDKFdNnXGF8VkjEvV8xRmZjcN2HMAtrs/exec", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, vote: voteString })
+    })
+    .then(res => res.text())
+    .then(msg => alert("Vote submitted: " + voteString))
+    .catch(err => alert("Error submitting vote."));
+  }
+
+  loadResponses();
+</script>
+
+</body>
+</html>
