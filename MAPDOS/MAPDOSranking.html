@@ -3,11 +3,89 @@
 <head>
   <title>MAPDOS Response Ranker</title>
   <style>
-    body { font-family: sans-serif; margin: 20px; }
-    #prompt { font-weight: bold; font-size: 1.2em; margin-bottom: 10px; }
-    #canvas { border: 1px solid #ccc; padding: 10px; min-height: 300px; background: #f9f9f9; }
-    .response { padding: 8px; margin: 5px 0; background: #fff; border: 1px solid #aaa; cursor: move; }
-    #controls { margin-top: 20px; }
+    body {
+      font-family: sans-serif;
+      padding: 2em;
+      background: repeating-linear-gradient(
+        315deg,
+        #9F5148,
+        #9F5148 20px,
+        #584238 20px,
+        #584238 40px
+      );
+      color: white;
+      text-align: center;
+    }
+
+    #prompt {
+      font-weight: bold;
+      font-size: 1.4em;
+      margin-bottom: 1em;
+    }
+
+    #canvas {
+      border: 4px solid #9F5148;
+      border-radius: 1rem;
+      padding: 1em;
+      background-color: #584238;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5em;
+      align-items: center;
+    }
+
+    .response {
+      background-color: #9F5148;
+      color: white;
+      padding: 0.75em 1em;
+      border-radius: 1rem;
+      cursor: move;
+      width: 80%;
+      font-size: 1.1em;
+      border: 2px solid #FE467C;
+    }
+
+    input[type="text"] {
+      width: 50%;
+      background-color: #584238;
+      color: white;
+      border: none;
+      outline: 4px solid #9F5148;
+      border-radius: 1rem;
+      padding: 0.5em 1em;
+      font-size: 1em;
+      box-sizing: border-box;
+      text-align: center;
+      margin-top: 1em;
+    }
+
+    input[type="text"]::placeholder {
+      color: #BFFFFF;
+      opacity: 1;
+    }
+
+    button {
+      border-radius: 1rem;
+      background-color: #FE467C;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 1em;
+    }
+
+    button:hover {
+      background-color: #FFFF80;
+      color: white;
+    }
+
+    button:active {
+      background-color: #00FF80;
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -15,17 +93,16 @@
 <div id="prompt">Loading prompt...</div>
 <div id="canvas"></div>
 
-<div id="controls">
-  <input type="text" id="voterName" placeholder="Enter your name" />
-  <button onclick="submitVote()">Submit Vote</button>
-</div>
+<input type="text" id="voterName" placeholder="Enter your name" />
+<br>
+<button onclick="submitVote()">Submit Vote</button>
 
 <script>
   const macroURL = "https://script.google.com/macros/s/AKfycbx4uqAyNCs7YRdS-LCzh7rA3HJg3JLEcC4XxDKFdNnXGF8VkjEvV8xRmZjcN2HMAtrs/exec?mode=votes";
   const canvas = document.getElementById("canvas");
   const promptDiv = document.getElementById("prompt");
-  let responseMap = {}; // letter → response
-  let responseOrder = []; // current order of letters
+  let responseMap = {};
+  let responseOrder = [];
 
   function getWordCount(s) {
     return s.split(" ").filter(w => [...w].some(ch => /\w/.test(ch))).length;
