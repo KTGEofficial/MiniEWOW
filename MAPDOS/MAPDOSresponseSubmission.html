@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>MAPDOS Response Submission</title>
+  <title>MAPDOS Response Submission – Stomach Preview</title>
   <style>
     body {
       font-family: sans-serif;
@@ -35,9 +35,17 @@
     .label {
       font-weight: bold;
     }
-    #stomachImpact {
-      margin-top: 0.5em;
-      font-style: italic;
+
+    /* Stomach preview styling */
+    #stomachContainer {
+      margin: 2em 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    svg {
+      width: 128px;
+      height: 128px;
     }
   </style>
 </head>
@@ -53,22 +61,50 @@
     <div id="healthFill"></div>
   </div>
 
-  <div id="userInfo"></div>
+  <!-- Stomach preview replaces textual stomach stats -->
+  <div id="stomachContainer">
+    <svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <clipPath id="vesselClip">
+          <path d="M 56 0 H 72 V 12 C 128 12 128 116 72 116 H 40 V 128 H 24 V 104 C 24 104 84 96 56 12 V 0 Z"/>
+        </clipPath>
+      </defs>
 
+      <!-- Outline -->
+      <path d="M 56 0 H 72 V 12 C 128 12 128 116 72 116 H 40 V 128 H 24 V 104 C 24 104 84 96 56 12 V 0 Z"
+            fill="none" stroke="#444" stroke-width="4"/>
+
+      <!-- Green (current stomach fill) -->
+      <rect id="greenFill" x="0" y="128" width="128" height="0"
+            fill="#00ff88" clip-path="url(#vesselClip)" />
+
+      <!-- Yellow (selected food preview) -->
+      <rect id="yellowFill" x="0" y="128" width="128" height="0"
+            fill="#ffff55" clip-path="url(#vesselClip)" />
+
+      <!-- Red (overflow) -->
+      <rect id="overflowFill" x="0" y="128" width="128" height="0"
+            fill="#ff4444" clip-path="url(#vesselClip)" />
+    </svg>
+  </div>
+
+  <!-- Food selection -->
   <p><strong>Choose food to eat:</strong></p>
   <select id="foodSelect"></select>
-  <div id="stomachImpact"></div>
+  <div id="stomachImpact" style="margin-top: 0.5em; font-style: italic;"></div>
 
+  <!-- Text response and metrics -->
   <input id="textInput" placeholder="Type your response here..." type="text" />
   <div class="output">
-    <div>
-      <span class="label">Word Count:</span>
-      <span id="wordCount">0</span>
-    </div>
-    <div>
-      <span class="label">Calorie Cost:</span>
-      <span id="calorieCost">0</span>
-    </div>
+    <div><span class="label">Word Count:</span> <span id="wordCount">0</span></div>
+    <div><span class="label">Calorie Cost:</span> <span id="calorieCost">0</span></div>
+  </div>
+
+  <!-- Hidden inputs to power the SVG logic -->
+  <div style="display: none;">
+    <input type="number" id="capacity" />
+    <input type="number" id="green" />
+    <input type="number" id="yellow" />
   </div>
 
   <script>
@@ -76,10 +112,9 @@
       let glyphData = {};
       let mapdosData = {};
 
-      const select = document.getElementById("userSelect");
-      const promptContainer = document.getElementById("promptDisplay");
+      const userSelect = document.getElementById("userSelect");
+      const promptDisplay = document.getElementById("promptDisplay");
       const healthFill = document.getElementById("healthFill");
-      const userInfoContainer = document.getElementById("userInfo");
 
       const foodSelect = document.getElementById("foodSelect");
       const stomachImpact = document.getElementById("stomachImpact");
@@ -88,117 +123,135 @@
       const wordCountDisplay = document.getElementById("wordCount");
       const calorieCostDisplay = document.getElementById("calorieCost");
 
+      // SVG fill elements and inputs
+      const capacityInput = document.getElementById("capacity");
+      const greenInput = document.getElementById("green");
+      const yellowInput = document.getElementById("yellow");
+      const greenFillRect = document.getElementById("greenFill");
+      const yellowFillRect = document.getElementById("yellowFill");
+      const overflowFillRect = document.getElementById("overflowFill");
+
       // Load glyph density JSON
       fetch("https://ktgeofficial.github.io/MiniEWOW/MAPDOS/MAPDOSfontProportions.json")
         .then(res => res.json())
-        .then(data => {
-          glyphData = data;
-        });
+        .then(data => glyphData = data);
 
-      // Load MAPDOS JSON from Apps Script
+      // Load MAPDOS data
       fetch("https://script.google.com/macros/s/AKfycbw1iY86evimRga_XhGddO2AlQyb63srbFsSeC-31RGc5FmKir9-EyG7tUIs6PS8MDai/exec?mode=submissions")
         .then(res => res.json())
         .then(data => {
           mapdosData = data;
-          populateUserDropdown(data);
+          buildUserSelect(data);
           displayPrompt(data.prompt);
         });
 
-      function populateUserDropdown(data) {
-        select.innerHTML = "";
+      function buildUserSelect(data) {
+        userSelect.innerHTML = "";
         Object.keys(data).forEach(key => {
           if (key === "prompt") return;
-          const option = document.createElement("option");
-          option.value = key;
-          option.textContent = key;
-          select.appendChild(option);
+          const opt = document.createElement("option");
+          opt.value = key;
+          opt.textContent = key;
+          userSelect.appendChild(opt);
         });
-        const firstUser = select.options[0]?.value;
-        if (firstUser) displayUserInfo(data[firstUser]);
-        select.addEventListener("change", () => {
-          displayUserInfo(data[select.value]);
+        if (userSelect.options.length) {
+          displayUserState(mapdosData[userSelect.value]);
+        }
+        userSelect.addEventListener("change", () => {
+          displayUserState(mapdosData[userSelect.value]);
         });
       }
 
-      function displayUserInfo(info) {
-        if (!info) return;
+      function displayPrompt(text) {
+        promptDisplay.innerHTML = `<p><strong>Prompt:</strong> ${text}</p>`;
+      }
 
+      function displayUserState(info) {
         // Health bar
-        const healthPercent = Math.min(100, Math.max(0, info.health));
-        healthFill.style.width = (healthPercent * (100 / 99)) + "%";
+        const pct = Math.min(100, Math.max(0, info.health));
+        healthFill.style.width = (pct * (100 / 99)) + "%";
 
-        // Basic stats
-        userInfoContainer.innerHTML = `
-          <p><strong>Stomach:</strong> ${info.stomach}</p>
-          <p><strong>Capacity:</strong> ${info.capacity}</p>
-          <p><strong>Rank:</strong> ${info.rank}</p>
-        `;
-
-        // Populate food select
+        // Populate food dropdown
         foodSelect.innerHTML = "";
-        const foodKeys = Object.keys(info.food);
+        const keys = Object.keys(info.food);
 
-        if (foodKeys.length > 0) {
-          // "Do not eat" option
+        if (keys.length) {
           const noneOpt = document.createElement("option");
           noneOpt.value = "none";
           noneOpt.textContent = "Do not eat any food";
           foodSelect.appendChild(noneOpt);
 
-          // One option per food item
-          foodKeys.forEach(key => {
-            const item = info.food[key];
-            const opt = document.createElement("option");
-            opt.value = key;
-            opt.id = `food-${key}`;
-            opt.textContent = item.name + (item.expired ? " (EXPIRED)" : "");
-            foodSelect.appendChild(opt);
+          keys.forEach(k => {
+            const item = info.food[k];
+            const o = document.createElement("option");
+            o.value = k;
+            o.id = `food-${k}`;
+            o.textContent = item.name + (item.expired ? " (EXPIRED)" : "");
+            foodSelect.appendChild(o);
           });
           foodSelect.disabled = false;
         } else {
-          // No food available
           const noOpt = document.createElement("option");
           noOpt.textContent = "No food available";
           noOpt.disabled = true;
           foodSelect.appendChild(noOpt);
           foodSelect.disabled = true;
-          stomachImpact.textContent = "";
         }
 
-        // When selection changes, show stomach impact
-        foodSelect.addEventListener("change", () => {
+        // Initialize stomach inputs
+        capacityInput.value = info.capacity;
+        greenInput.value = info.stomach;
+        yellowInput.value = 0;
+        updateStomachSVG();
+
+        foodSelect.onchange = () => {
           const sel = foodSelect.value;
           if (sel === "none") {
             stomachImpact.textContent = "No food selected.";
+            yellowInput.value = 0;
           } else {
-            const it = info.food[sel];
-            stomachImpact.textContent = `Eating this will add ${it.mass} to stomach.`;
+            const itm = info.food[sel];
+            stomachImpact.textContent = `Eating this will add ${itm.mass} to stomach.`;
+            yellowInput.value = itm.mass;
           }
-        });
-
-        // Reset impact display
-        stomachImpact.textContent = "";
+          updateStomachSVG();
+        };
       }
 
-      function displayPrompt(txt) {
-        promptContainer.innerHTML = `<p><strong>Prompt:</strong> ${txt}</p>`;
+      function updateStomachSVG() {
+        const cap = parseFloat(capacityInput.value) || 1;
+        const gr = parseFloat(greenInput.value) || 0;
+        const yl = parseFloat(yellowInput.value) || 0;
+        const total = gr + yl;
+        const maxH = 128;
+
+        if (total <= cap) {
+          const gh = (gr / cap) * maxH;
+          const yh = (yl / cap) * maxH;
+          greenFillRect.setAttribute("height", gh);
+          greenFillRect.setAttribute("y", maxH - gh);
+          yellowFillRect.setAttribute("height", yh);
+          yellowFillRect.setAttribute("y", maxH - gh - yh);
+          overflowFillRect.setAttribute("height", 0);
+        } else {
+          greenFillRect.setAttribute("height", 0);
+          yellowFillRect.setAttribute("height", 0);
+          overflowFillRect.setAttribute("height", maxH);
+          overflowFillRect.setAttribute("y", 0);
+        }
       }
 
-      function getWordCount(str) {
-        return str
-          .split(" ")
-          .filter(w => [...w].some(ch => /\w/.test(ch)))
-          .length;
+      function getWordCount(s) {
+        return s.split(" ").filter(w => [...w].some(ch => /\w/.test(ch))).length;
       }
 
-      function getCalorieCost(str) {
-        return [...str].reduce((sum, ch) => sum + (glyphData[ch] || 0), 0);
+      function getCalorieCost(s) {
+        return [...s].reduce((sum, c) => sum + (glyphData[c] || 0), 0);
       }
 
       textInput.addEventListener("input", () => {
-        const t = textInput.value;
-        wordCountDisplay.textContent = getWordCount(t);
-        calorieCostDisplay.textContent = getCalorieCost(t);
+        wordCountDisplay.textContent = getWordCount(textInput.value);
+        calorieCostDisplay.textContent = getCalorieCost(textInput.value);
       });
     });
   </script>
