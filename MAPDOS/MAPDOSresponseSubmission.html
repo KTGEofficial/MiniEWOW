@@ -113,7 +113,9 @@
     <input type="number" id="capacity" />
     <input type="number" id="green" />
     <input type="number" id="yellow" />
-  </div>
+  </div><!-- Submit button -->
+<button id="submitBtn">Submit Response</button>
+
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     let glyphData = {};
@@ -150,7 +152,7 @@
       .then(data => glyphData = data);
 
     // Load MAPDOS data
-    fetch("https://script.google.com/macros/s/AKfycbw1iY86evimRga_XhGddO2AlQyb63srbFsSeC-31RGc5FmKir9-EyG7tUIs6PS8MDai/exec?mode=submissions")
+    fetch("https://script.google.com/macros/s/AKfycbxBzq7rioGGaaAJq3kxUh-Av3ST-rZ-0BwPU-tQ0qcuJufk7CnG6fb2brekKWOHHO40/exec?mode=submissions")
       .then(res => res.json())
       .then(data => {
         mapdosData = data;
@@ -315,7 +317,76 @@
       wordCountDisplay.textContent = getWordCount(textInput.value);
       calorieCostDisplay.textContent = getCalorieCost(textInput.value);
     });
+
+    const submitBtn = document.getElementById("submitBtn");
+
+    // --- submission handler ---
+    function submitResponse() {
+      let contestant;
+      let foodid = -1;
+
+      if (userSelect.value === "custom") {
+        contestant = customNameInput.value.trim() || "Anonymous Filler";
+        foodid = -1; // force none for filler
+      } else {
+        contestant = userSelect.value;
+        if (!foodSelect.disabled && foodSelect.value !== "none") {
+          foodid = parseInt(foodSelect.value); // backend expects number keys
+        }
+      }
+
+      const responseText = textInput.value.trim();
+      const healthcost = getCalorieCost(responseText);
+
+      if (!responseText) {
+        alert("Please type a response before submitting.");
+        return;
+      }
+
+      const params = new URLSearchParams({
+        mode: "submitted",
+        username: contestant,
+        foodid: foodid.toString(),
+        healthcost: healthcost.toString(),
+        response: responseText
+      });
+
+      fetch("https://script.google.com/macros/s/AKfycbxBzq7rioGGaaAJq3kxUh-Av3ST-rZ-0BwPU-tQ0qcuJufk7CnG6fb2brekKWOHHO40/exec?" + params.toString())
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === "success") {
+            alert("Response submitted successfully!");
+            textInput.value = "";
+            wordCountDisplay.textContent = "0";
+            calorieCostDisplay.textContent = "0";
+          } else {
+            alert("Submission failed: " + (data.error || "Unknown error"));
+          }
+        })
+        .catch(err => {
+          alert("Failed to submit response.");
+          console.error(err);
+        });
+    }
+
+    submitBtn.addEventListener("click", submitResponse);
+
+    // tweak displayUserState so filler disables food
+    const origDisplayUserState = displayUserState;
+    displayUserState = function(info) {
+      origDisplayUserState(info);
+      if (userSelect.value === "custom") {
+        // force no food when filler response
+        foodSelect.innerHTML = "";
+        const noOpt = document.createElement("option");
+        noOpt.textContent = "No food (filler response)";
+        noOpt.disabled = true;
+        foodSelect.appendChild(noOpt);
+        foodSelect.disabled = true;
+      }
+    }
   });
 </script>
+
 </body>
 </html>
