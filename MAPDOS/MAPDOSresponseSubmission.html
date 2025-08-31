@@ -8,7 +8,7 @@
   font-family: sans-serif;
   padding: 2em;
   background: repeating-linear-gradient(
-    45deg,
+    315deg,
     #9F5148,
     #9F5148 20px,
     #584238 20px,
@@ -55,7 +55,18 @@
     svg {
       width: 128px;
       height: 128px;
-    }
+    }select {
+  background-color: #584238;
+  color: white;
+  border: none;
+  outline: 4px solid #9F5148;
+  border-radius: 8px;
+  padding: 0.5em 1em;
+  font-size: 1em;
+  appearance: none; /* Optional: removes default arrow styling */
+  cursor: pointer;
+}
+
   </style>
 </head>
 <body>
@@ -100,7 +111,7 @@
   <!-- Food selection -->
   <p><strong>Choose food to eat:</strong></p>
   <select id="foodSelect"></select>
-
+<br>
   <!-- Text response and metrics -->
   <input id="textInput" placeholder="Type your response here..." type="text" />
   <div class="output">
@@ -356,7 +367,6 @@
         .then(res => res.json())
         .then(data => {
           if (data.status === "success") {
-            alert("Response submitted successfully!");
             textInput.value = "";
             wordCountDisplay.textContent = "0";
             calorieCostDisplay.textContent = "0";
