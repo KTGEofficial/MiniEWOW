@@ -123,7 +123,7 @@
 
 <input type="text" id="voterName" placeholder="Enter your name" />
 <br>
-<button onclick="submitVote()">Submit Vote</button>
+<button onclick="submitVote()">Submit Ranking</button>
 
 <script>
   const macroURL = "https://script.google.com/macros/s/AKfycbxCamtt8Sh4kGojpiTeGpRpZiiZZR9EZMD-SwNlhLhgwD91B0btxqcu7bfVsXLXbB9c/exec?mode=votes";
@@ -186,8 +186,7 @@
 
   fetch(`https://script.google.com/macros/s/AKfycbxCamtt8Sh4kGojpiTeGpRpZiiZZR9EZMD-SwNlhLhgwD91B0btxqcu7bfVsXLXbB9c/exec?${query.toString()}`)
     .then(res => res.text())
-    .then(msg => alert("Vote submitted: " + voteString))
-    .catch(err => alert("Error submitting vote."));
+    .catch(err => alert("Error ranking."));
 }
 
 
