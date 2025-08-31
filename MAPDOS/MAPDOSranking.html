@@ -36,35 +36,24 @@
 
 
     .response {
-  position: relative;
-  width: 100%;
-  font-size: 1.1em;
-  padding: 0.75em 1em;
-  color: white;
-  cursor: move;
-  border-radius: 1rem;
-  background-color: #584238;
-  overflow: hidden;
-  box-sizing: border-box;
-}
+  position: relative;
+  width: 100%;
+  font-size: 1.1em;
+  padding: 0.75em 1em;
+  color: white;
+  cursor: move;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-sizing: border-box;
 
-/* Flat yellow top band behind text */
-.response::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 50%;
-  background-color: #ffa172;
-  /* Remove z-index or set it to a negative value */
-  z-index: -1;
+  /* Use a linear gradient to create the two solid color bands */
+  background: linear-gradient(to bottom, #ffa172 50%, #584238 50%);
 }
 
 /* Ensure text and content sit above the yellow band */
 .response > * {
-  position: relative;
-  z-index: 1;
+  position: relative;
+  z-index: 1;
 }
     input[type="text"] {
       width: 50%;
