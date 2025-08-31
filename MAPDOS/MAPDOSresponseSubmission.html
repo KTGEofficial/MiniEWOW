@@ -344,12 +344,13 @@
       }
 
       const params = new URLSearchParams({
-        mode: "submitted",
-        username: contestant,
-        foodid: foodid.toString(),
-        healthcost: healthcost.toString(),
-        response: responseText
-      });
+  mode: "submitted",
+  username: contestant,
+  foodid: foodid !== null ? foodid.toString() : "null",
+  healthcost: healthcost.toString(),
+  response: responseText
+});
+
 
       fetch("https://script.google.com/macros/s/AKfycbzlG-kTHqE3xT5TEv_OYXJyPPfnIw5LFLtigkAa5XQpxWo9BpyFWT_UXS9ioC_gNrHk/exec?" + params.toString())
         .then(res => res.json())
