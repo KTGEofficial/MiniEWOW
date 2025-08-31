@@ -152,7 +152,7 @@
       .then(data => glyphData = data);
 
     // Load MAPDOS data
-    fetch("https://script.google.com/macros/s/AKfycbxBzq7rioGGaaAJq3kxUh-Av3ST-rZ-0BwPU-tQ0qcuJufk7CnG6fb2brekKWOHHO40/exec?mode=submissions")
+    fetch("https://script.google.com/macros/s/AKfycbzlG-kTHqE3xT5TEv_OYXJyPPfnIw5LFLtigkAa5XQpxWo9BpyFWT_UXS9ioC_gNrHk/exec?mode=submissions")
       .then(res => res.json())
       .then(data => {
         mapdosData = data;
@@ -351,7 +351,7 @@
         response: responseText
       });
 
-      fetch("https://script.google.com/macros/s/AKfycbxBzq7rioGGaaAJq3kxUh-Av3ST-rZ-0BwPU-tQ0qcuJufk7CnG6fb2brekKWOHHO40/exec?" + params.toString())
+      fetch("https://script.google.com/macros/s/AKfycbzlG-kTHqE3xT5TEv_OYXJyPPfnIw5LFLtigkAa5XQpxWo9BpyFWT_UXS9ioC_gNrHk/exec?" + params.toString())
         .then(res => res.json())
         .then(data => {
           if (data.status === "success") {
