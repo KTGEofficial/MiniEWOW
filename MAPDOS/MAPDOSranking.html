@@ -56,11 +56,11 @@
   z-index: 1;
 }
     input[type="text"] {
-      width: 50%;
-      background-color: #584238;
+      width: 100%;
+      background-color: #9F5148;
       color: white;
       border: none;
-      outline: 4px solid #9F5148;
+      outline: 4px solid #584238;
       border-radius: 1rem;
       padding: 0.5em 1em;
       font-size: 1em;
@@ -126,7 +126,7 @@
 <button onclick="submitVote()">Submit Vote</button>
 
 <script>
-  const macroURL = "https://script.google.com/macros/s/AKfycbx4uqAyNCs7YRdS-LCzh7rA3HJg3JLEcC4XxDKFdNnXGF8VkjEvV8xRmZjcN2HMAtrs/exec?mode=votes";
+  const macroURL = "https://script.google.com/macros/s/AKfycbxCamtt8Sh4kGojpiTeGpRpZiiZZR9EZMD-SwNlhLhgwD91B0btxqcu7bfVsXLXbB9c/exec?mode=votes";
   const canvas = document.getElementById("canvas");
   const promptDiv = document.getElementById("prompt");
   let responseMap = {};
@@ -184,7 +184,7 @@
     vote: voteString
   });
 
-  fetch(`https://script.google.com/macros/s/AKfycbx4uqAyNCs7YRdS-LCzh7rA3HJg3JLEcC4XxDKFdNnXGF8VkjEvV8xRmZjcN2HMAtrs/exec?${query.toString()}`)
+  fetch(`https://script.google.com/macros/s/AKfycbxCamtt8Sh4kGojpiTeGpRpZiiZZR9EZMD-SwNlhLhgwD91B0btxqcu7bfVsXLXbB9c/exec?${query.toString()}`)
     .then(res => res.text())
     .then(msg => alert("Vote submitted: " + voteString))
     .catch(err => alert("Error submitting vote."));
