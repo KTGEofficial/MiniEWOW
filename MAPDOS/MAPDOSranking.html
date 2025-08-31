@@ -24,27 +24,46 @@
     }
 
     #canvas {
-      border: 4px solid #9F5148;
-      border-radius: 1rem;
-      padding: 1em;
-      background-color: #584238;
-      min-height: 300px;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5em;
-      align-items: center;
-    }
+  padding: 1em;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  align-items: center;
+  background: none;
+  border: none;
+}
+
 
     .response {
-      background-color: #9F5148;
-      color: white;
-      padding: 0.75em 1em;
-      border-radius: 1rem;
-      cursor: move;
-      width: 80%;
-      font-size: 1.1em;
-      border: 2px solid #FE467C;
-    }
+  position: relative;
+  width: 80%;
+  font-size: 1.1em;
+  padding: 0.75em 1em;
+  color: white;
+  cursor: move;
+  border-radius: 1rem;
+  background-color: #584238;
+  overflow: hidden;
+}
+
+.response::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background-color: #ffa172;
+  clip-path: path("M0,50 Q50,0 100,50 L100,0 L0,0 Z");
+  z-index: 0;
+}
+
+.response > * {
+  position: relative;
+  z-index: 1;
+}
+
 
     input[type="text"] {
       width: 50%;
