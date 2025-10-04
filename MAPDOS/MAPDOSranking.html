@@ -126,7 +126,7 @@
 <button onclick="submitVote()">Submit Ranking</button>
 
 <script>
-  const macroURL = "https://script.google.com/macros/s/AKfycbxCamtt8Sh4kGojpiTeGpRpZiiZZR9EZMD-SwNlhLhgwD91B0btxqcu7bfVsXLXbB9c/exec?mode=votes";
+  const macroURL = "https://script.google.com/macros/s/AKfycbyrbg89YiVVhg0RWSe4mSD0qOVyNkoTgrpJK2zjI6aEjRIGmec0p8Ea0Ep_lCf-6o-e/exec?mode=votes";
   const canvas = document.getElementById("canvas");
   const promptDiv = document.getElementById("prompt");
   let responseMap = {};
@@ -184,7 +184,7 @@
     vote: voteString
   });
 
-  fetch(`https://script.google.com/macros/s/AKfycbxCamtt8Sh4kGojpiTeGpRpZiiZZR9EZMD-SwNlhLhgwD91B0btxqcu7bfVsXLXbB9c/exec?${query.toString()}`)
+  fetch(`https://script.google.com/macros/s/AKfycbyrbg89YiVVhg0RWSe4mSD0qOVyNkoTgrpJK2zjI6aEjRIGmec0p8Ea0Ep_lCf-6o-e/exec?${query.toString()}`)
     .then(res => res.text())
     .catch(err => alert("Error ranking."));
 }
