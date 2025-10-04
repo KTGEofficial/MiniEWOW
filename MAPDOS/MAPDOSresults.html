@@ -147,7 +147,7 @@
     const data = await res.json();
     results = data.results;
     foodOptions = data.food;
-
+await console.log(data);
     const tbody = document.querySelector("#leaderboard tbody");
     const usernames = new Set();
 
