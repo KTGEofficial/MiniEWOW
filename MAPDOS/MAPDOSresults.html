@@ -181,8 +181,8 @@ await console.log(data);
     const foodSelect = document.getElementById("foodSelect");
     foodOptions.forEach(food => {
       const option = document.createElement("option");
-      option.value = food.FoodID;
-      option.textContent = food.FoodName;
+      option.value = food.ID;
+      option.textContent = food.Name;
       foodSelect.appendChild(option);
     });
   }
