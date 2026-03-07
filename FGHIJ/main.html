@@ -33,20 +33,20 @@
         };
         function parsePrompt(str) {
             if (typeof str === 'string') { let promptData = str; } else { let promptData = str[0]; }
-            const index = str.indexOf(" ");
+            const index = promptData.indexOf(" ");
             
             if (index === -1) {
                 return "Error: Prompt data might be corrupted";
             }
 
-            if (isNaN(parseInt(str.slice(0, index), 10))) {
-                if (str.trim().startsWith('E')) {
-                    return str;
+            if (isNaN(parseInt(promptData.slice(0, index), 10))) {
+                if (promptData.trim().startsWith('E')) {
+                    return promptData;
                 } else {
                     return "Error: Prompt data might be corrupted";
                 }
             } else {
-                return `Prompt ${str.slice(0, index)}: ${str.slice(index + 1)}`;
+                return `Prompt ${promptData.slice(0, index)}: ${promptData.slice(index + 1)}`;
             }
         }
         document.getElementById("lettersCounter").class = "low";
@@ -71,7 +71,7 @@
                 document.getElementById("custom-css").textContent = `
 body,html{height:100%}
 body{
-  background-color:${result.prompt[2].slice(result.prompt[2].indexOf(" ") + 1)};
+  background:${result.prompt[2].slice(result.prompt[2].indexOf(" ") + 1)};
   font-family:Arial,sans-serif;
   text-align:center;
   color:${result.prompt[3].split(" ")[2]}
