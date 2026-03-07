@@ -49,7 +49,7 @@
                 return `Prompt ${promptData.slice(0, index)}: ${promptData.slice(index + 1)}`;
             }
         }
-        document.getElementById("lettersCounter").class = "low";
+        document.getElementById("lettersCounter").className = "low";
         const container = document.getElementById("letters");
         const inputBox = document.getElementById("inputBox");
         const wordCounter = document.getElementById("wordCounter"); const lettersCounter = document.getElementById("lettersCounter");
@@ -193,8 +193,8 @@ span{font-weight:700}
     // apply final color on animationend (so keyframe color steps are visible)
     el._animEndHandler = () => {
       el.style.animation = "none";
-      if (finalColor) { el.classList.remove("high", "med", "low");
-el.classList.add(finalColor); }
+      if (finalColor) { el.classNameList.remove("high", "med", "low");
+el.classNameList.add(finalColor); }
       el.removeEventListener("animationend", el._animEndHandler);
       el._animEndHandler = null;
     };
@@ -210,9 +210,9 @@ el.classList.add(finalColor); }
     triggerAnim(wordCounter, "redClockwise", "low");
   } else {
     // no threshold crossing — keep color consistent
-    if (words.length === 14) wordCounter.class = "high";
-    else if (words.length > 14) wordCounter.class = "low";
-    else wordCounter.class = "med";
+    if (words.length === 14) wordCounter.className = "high";
+    else if (words.length > 14) wordCounter.className = "low";
+    else wordCounter.className = "med";
   }
 
   // LETTER thresholds (25 target, allow 26 overflow)
@@ -226,8 +226,8 @@ el.classList.add(finalColor); }
     triggerAnim(lettersCounter, "spinClockwiseNeutral", "med");
   } else {
     // no threshold crossing — keep color consistent
-    if (letterCount >= 25) lettersCounter.class = "med";
-    else lettersCounter.class = "low";
+    if (letterCount >= 25) lettersCounter.className = "med";
+    else lettersCounter.className = "low";
   }
 }
 // The secret sequence
@@ -294,7 +294,7 @@ function triggerSecretOrder() {
                     span.style.animation = "none";
                     span.offsetHeight; // Force reflow to restart animation
                     span.style.animation = "spinClockwise 0.5s ease-in-out forwards";
-                    span.class = "high";
+                    span.className = "high";
                     setTimeout(() => span.style.animation = "none", 500);
                 }
             });
@@ -305,7 +305,7 @@ function triggerSecretOrder() {
                     span.style.animation = "none";
                     span.offsetHeight; // Force reflow
                     span.style.animation = "spinCounterclockwise 0.5s ease-in-out forwards";
-                    span.class = "med";
+                    span.className = "med";
                     setTimeout(() => span.style.animation = "none", 500);
                 }
             });
