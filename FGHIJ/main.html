@@ -193,7 +193,8 @@ span{font-weight:700}
     // apply final color on animationend (so keyframe color steps are visible)
     el._animEndHandler = () => {
       el.style.animation = "none";
-      if (finalColor) el.className = finalColor;
+      if (finalColor) { el.classList.remove("high", "med", "low");
+el.classList.add(finalColor); }
       el.removeEventListener("animationend", el._animEndHandler);
       el._animEndHandler = null;
     };
