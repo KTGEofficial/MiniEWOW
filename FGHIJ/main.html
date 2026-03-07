@@ -1,155 +1,13 @@
 <html lang="en"><head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FGHIJ Website</title>
-    <style>html, body {
-    height: 100%;
-    margin: 0;
-}
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-
-        span {
-            font-weight: bold;
-        }
-
-        #inputBox {
-            font-size: 1.5rem;
-            padding: 10px;
-            margin: 20px;
-            text-align: center;
-        }
-
-        #letters {
-            font-size: 2rem;
-            letter-spacing: 5px;
-            display: flex;
-            justify-content: center;
-            position: relative;
-        }
-
-            #letters span {
-                display: inline-block;
-                position: absolute;
-                transition: transform 0.5s ease-in-out, color 0.5s linear;
-                transform-origin: center;
-            }
-
-        #wordCounter {
-            font-size: 1.2rem;
-            margin-top: 10px;
-        }
-
-        @keyframes spinClockwise {
-            0% {
-                transform: translateX(var(--translate-x)) rotateY(0deg);
-            }
-
-            33% {
-                transform: translateX(var(--translate-x)) rotateY(90deg);
-                color: lawngreen;
-            }
-
-            100% {
-                transform: translateX(var(--translate-x)) rotateY(360deg);
-                color: lawngreen;
-            }
-        }
-
-        @keyframes spinClockwiseTranslateXexcluded {
-            0% {
-                transform: rotateY(0deg);
-            }
-
-            50% {
-                transform: rotateY(90deg);
-                color: lawngreen;
-            }
-
-            100% {
-                transform: rotateY(360deg);
-                color: lawngreen;
-            }
-        }
-        @keyframes redClockwise {
-            0% {
-                transform: rotateY(0deg);
-            }
-
-            33% {
-                transform: rotateY(90deg);
-                color: red;
-            }
-
-            100% {
-                transform: rotateY(360deg);
-                color: red;
-            }
-        }
-
-        @keyframes redCounterclockwise {
-            0% {
-                transform: rotateY(360deg);
-            }
-
-            50% {
-                transform: rotateY(90deg);
-                color: red;
-            }
-
-            100% {
-                transform: rotateY(0deg);
-                color: red;
-            }
-        }
-        @keyframes spinCounterclockwise {
-            0% {
-                transform: translateX(var(--translate-x)) rotateY(360deg);
-            }
-
-            66% {
-                transform: translateX(var(--translate-x)) rotateY(90deg);
-                color: white;
-            }
-
-            100% {
-                transform: translateX(var(--translate-x)) rotateY(0deg);
-                color: white;
-            }
-        }
-
-        @keyframes spinClockwiseNeutral {
-            0% {
-                transform: rotateY(0deg);
-            }
-
-            50% {
-                transform: rotateY(90deg);
-                color: white;
-            }
-
-            100% {
-                transform: rotateY(360deg);
-                color: white;
-            }
-        }
-        @keyframes pulse {
-            0%, 100% {
-                transform: translateX(var(--translate-x)) scale(1);
-            }
-
-            50% {
-                transform: translateX(var(--translate-x)) scale(1.5);
-            }
-        }
-    </style>
+    <style id="custom-css">body,html{height:100%}body{font-family:Arial,sans-serif;text-align:center;background-color:black;color:white}span{font-weight:700}#inputBox{font-size:1.5rem;padding:10px;margin:20px;text-align:center}#letters{font-size:2rem;letter-spacing:5px;display:flex;justify-content:center;position:relative}#letters span{display:inline-block;position:absolute;transition:transform .5s ease-in-out,color .5s linear;transform-origin:center}#wordCounter{font-size:1.2rem;margin-top:10px}@keyframes spinClockwise{0%{transform:translateX(var(--translate-x)) rotateY(0deg)}33%{transform:translateX(var(--translate-x)) rotateY(90deg);color:#7cfc00}to{transform:translateX(var(--translate-x)) rotateY(1turn);color:#7cfc00}}@keyframes spinClockwiseTranslateXexcluded{0%{transform:rotateY(0deg)}50%{transform:rotateY(90deg);color:#7cfc00}to{transform:rotateY(1turn);color:#7cfc00}}@keyframes redClockwise{0%{transform:rotateY(0deg)}33%{transform:rotateY(90deg);color:red}to{transform:rotateY(1turn);color:red}}@keyframes redCounterclockwise{0%{transform:rotateY(1turn)}50%{transform:rotateY(90deg);color:red}to{transform:rotateY(0deg);color:red}}@keyframes spinCounterclockwise{0%{transform:translateX(var(--translate-x)) rotateY(1turn)}66%{transform:translateX(var(--translate-x)) rotateY(90deg);color:#fff}to{transform:translateX(var(--translate-x)) rotateY(0deg);color:#fff}}@keyframes spinClockwiseNeutral{0%{transform:rotateY(0deg)}50%{transform:rotateY(90deg);color:#fff}to{transform:rotateY(1turn);color:#fff}}@keyframes pulse{0%,to{transform:translateX(var(--translate-x)) scale(1)}50%{transform:translateX(var(--translate-x)) scale(1.5)}}</style>
 </head>
 <body>
     <h1>FGHIJ Website</h1>
-    <a href="">Watch FGHIJ </a><h2 id="prompt">Prompt : </h2>
-    <p id="wordCounter" style="--translate-x: 0;">Word count: 0</p>
-    <p id="lettersCounter" style="color: red;">(0 / 25)</p>
+    <a href="" class="white">Loading</a><h2 id="prompt">Prompt : </h2>
+    <p id="wordCounter" style="--translate-x: 0;" class="white">Word count: 0</p>
+    <p id="lettersCounter" class="red">(0 / 25)</p>
     <input type="text" id="inputBox" placeholder="Type here..." style="width: 390px;">
     <label for="order">Sort Order:</label>
     <select id="order">
@@ -170,7 +28,8 @@
             textFreq: "etaoinshrdlcumwfgypbvkjxqz",
             dictFreq: "esiarntolcdugpmhbyfvkwzxjq",
             ewowFreq: "etoainsrldhumcwygpfbvkxjzq",
-            abcdeFreq: "eiatsnorlucdgmyhpbfwkvzxjq"
+            abcdeFreq: "eiatsnorlucdgmyhpbfwkvzxjq",
+            placeholder: "notreadybcfghijklmpqsuvwxz"
         };
         function parsePrompt(str) {
             const index = str.indexOf(" ");
@@ -314,9 +173,38 @@
     else lettersCounter.style.color = "red";
   }
 }
+// The secret sequence
+const secret = ["n", "o", "t", "r", "e", "a", "d", "y"];
+let secretPosition = 0;
 
+document.addEventListener("keydown", (event) => {
+    const key = event.key.toLowerCase();
+    if (key === secret[position]) {
+        position++;
 
+        // If full sequence matched
+        if (secretPosition === secret.length) {
+            secretPosition = 0;
+            triggerSecretOrder();
+        }
+    } else {
+        position = 0;
+    }
+});
 
+function triggerSecretOrder() {
+    const select = document.getElementById("order");
+    if (!select) return;
+    const existing = select.querySelector('option[value="placeholder"]');
+
+    if (!existing) {
+        const opt = document.createElement("option");
+        opt.value = "placeholder";
+        opt.textContent = "Placeholder Order";
+        select.appendChild(opt);
+        select.value = "placeholder";
+    }
+}
 
         // Reordering letters based on the selected order
         function updateOrder() {
