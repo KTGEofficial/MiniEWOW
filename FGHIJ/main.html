@@ -1,0 +1,394 @@
+<html lang="en"><head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FGHIJ Website</title>
+    <style>html, body {
+    height: 100%;
+    margin: 0;
+}
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        span {
+            font-weight: bold;
+        }
+
+        #inputBox {
+            font-size: 1.5rem;
+            padding: 10px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        #letters {
+            font-size: 2rem;
+            letter-spacing: 5px;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+            #letters span {
+                display: inline-block;
+                position: absolute;
+                transition: transform 0.5s ease-in-out, color 0.5s linear;
+                transform-origin: center;
+            }
+
+        #wordCounter {
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        @keyframes spinClockwise {
+            0% {
+                transform: translateX(var(--translate-x)) rotateY(0deg);
+            }
+
+            33% {
+                transform: translateX(var(--translate-x)) rotateY(90deg);
+                color: lawngreen;
+            }
+
+            100% {
+                transform: translateX(var(--translate-x)) rotateY(360deg);
+                color: lawngreen;
+            }
+        }
+
+        @keyframes spinClockwiseTranslateXexcluded {
+            0% {
+                transform: rotateY(0deg);
+            }
+
+            50% {
+                transform: rotateY(90deg);
+                color: lawngreen;
+            }
+
+            100% {
+                transform: rotateY(360deg);
+                color: lawngreen;
+            }
+        }
+        @keyframes redClockwise {
+            0% {
+                transform: rotateY(0deg);
+            }
+
+            33% {
+                transform: rotateY(90deg);
+                color: red;
+            }
+
+            100% {
+                transform: rotateY(360deg);
+                color: red;
+            }
+        }
+
+        @keyframes redCounterclockwise {
+            0% {
+                transform: rotateY(360deg);
+            }
+
+            50% {
+                transform: rotateY(90deg);
+                color: red;
+            }
+
+            100% {
+                transform: rotateY(0deg);
+                color: red;
+            }
+        }
+        @keyframes spinCounterclockwise {
+            0% {
+                transform: translateX(var(--translate-x)) rotateY(360deg);
+            }
+
+            66% {
+                transform: translateX(var(--translate-x)) rotateY(90deg);
+                color: white;
+            }
+
+            100% {
+                transform: translateX(var(--translate-x)) rotateY(0deg);
+                color: white;
+            }
+        }
+
+        @keyframes spinClockwiseNeutral {
+            0% {
+                transform: rotateY(0deg);
+            }
+
+            50% {
+                transform: rotateY(90deg);
+                color: white;
+            }
+
+            100% {
+                transform: rotateY(360deg);
+                color: white;
+            }
+        }
+        @keyframes pulse {
+            0%, 100% {
+                transform: translateX(var(--translate-x)) scale(1);
+            }
+
+            50% {
+                transform: translateX(var(--translate-x)) scale(1.5);
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>FGHIJ Website</h1>
+    <a href="">Watch FGHIJ </a><h2 id="prompt">Prompt : </h2>
+    <p id="wordCounter" style="--translate-x: 0;">Word count: 0</p>
+    <p id="lettersCounter" style="color: red;">(0 / 25)</p>
+    <input type="text" id="inputBox" placeholder="Type here..." style="width: 390px;">
+    <label for="order">Sort Order:</label>
+    <select id="order">
+        <option value="alphabetical">Alphabetical</option>
+        <option value="qwerty">Keyboard Order</option>
+        <option value="textFreq">Text Frequency</option>
+        <option value="dictFreq">Dictionary Frequency</option>
+        <option value="ewowFreq">EWOW Frequency</option>
+        <option value="abcdeFreq">ABCDE Frequency</option>
+    </select>
+    <label for="reverse">Reverse:</label>
+    <input type="checkbox" id="reverse">
+    <div id="letters"><span style="transform: translateX(-500px); --translate-x: -500px;">a</span><span style="transform: translateX(-460px); --translate-x: -460px;">b</span><span style="transform: translateX(-420px); --translate-x: -420px;">c</span><span style="transform: translateX(-380px); --translate-x: -380px;">d</span><span style="transform: translateX(-340px); --translate-x: -340px;">e</span><span style="transform: translateX(-300px); --translate-x: -300px;">f</span><span style="transform: translateX(-260px); --translate-x: -260px;">g</span><span style="transform: translateX(-220px); --translate-x: -220px;">h</span><span style="transform: translateX(-180px); --translate-x: -180px;">i</span><span style="transform: translateX(-140px); --translate-x: -140px;">j</span><span style="transform: translateX(-100px); --translate-x: -100px;">k</span><span style="transform: translateX(-60px); --translate-x: -60px;">l</span><span style="transform: translateX(-20px); --translate-x: -20px;">m</span><span style="transform: translateX(20px); --translate-x: 20px;">n</span><span style="transform: translateX(60px); --translate-x: 60px;">o</span><span style="transform: translateX(100px); --translate-x: 100px;">p</span><span style="transform: translateX(140px); --translate-x: 140px;">q</span><span style="transform: translateX(180px); --translate-x: 180px;">r</span><span style="transform: translateX(220px); --translate-x: 220px;">s</span><span style="transform: translateX(260px); --translate-x: 260px;">t</span><span style="transform: translateX(300px); --translate-x: 300px;">u</span><span style="transform: translateX(340px); --translate-x: 340px;">v</span><span style="transform: translateX(380px); --translate-x: 380px;">w</span><span style="transform: translateX(420px); --translate-x: 420px;">x</span><span style="transform: translateX(460px); --translate-x: 460px;">y</span><span style="transform: translateX(500px); --translate-x: 500px;">z</span></div>
+    <script>
+        const orders = {
+            alphabetical: "abcdefghijklmnopqrstuvwxyz",
+            qwerty: "qwertyuiopasdfghjklzxcvbnm",
+            textFreq: "etaoinshrdlcumwfgypbvkjxqz",
+            dictFreq: "esiarntolcdugpmhbyfvkwzxjq",
+            ewowFreq: "etoainsrldhumcwygpfbvkxjzq",
+            abcdeFreq: "eiatsnorlucdgmyhpbfwkvzxjq"
+        };
+        function parsePrompt(str) {
+            const index = str.indexOf(" ");
+            
+            if (index === -1) {
+                return "Error: Prompt data might be corrupted";
+            }
+
+            if (isNaN(parseInt(str.slice(0, index), 10))) {
+                if (str.trim().startsWith('E')) {
+                    return str;
+                } else {
+                    return "Error: Prompt data might be corrupted";
+                }
+            } else {
+                return `Prompt ${str.slice(0, index)}: ${str.slice(index + 1)}`;
+            }
+        }
+        document.getElementById("lettersCounter").style.color = "red";
+        const container = document.getElementById("letters");
+        const inputBox = document.getElementById("inputBox");
+        const wordCounter = document.getElementById("wordCounter"); const lettersCounter = document.getElementById("lettersCounter");
+        const alphabet = "abcdefghijklmnopqrstuvwxyz";
+        const letterSpans = {};
+
+        const url = "https://script.google.com/macros/s/AKfycbyvx4NaNw17glaj95utUxHkNZZsFwNqaDvdJiBQ_7AUGQy7mWFVxjb8oZpX3GKbwhXN/exec";
+
+        (async () => {
+            try {
+                const response = await fetch(url);
+                const result = await response.json();
+
+                if (Object.keys(result).length === 1 && result.hasOwnProperty('prompt')) {
+                    document.getElementById("prompt").innerText = parsePrompt(result.prompt);
+                } else {
+                    document.getElementById("prompt").innerText = "Error retrieving prompt: Can not retrieve prompt from external script!";
+                }
+            } catch (error) {
+                console.error("Error retrieving prompt:", error);
+            }
+        })();
+
+        wordCounter.style.setProperty('--translate-x', 0);
+
+        // Initialize letter display
+        alphabet.split("").forEach((char, index) => {
+            let span = document.createElement("span");
+            const letterSpacing = container.clientWidth / 37.8;
+            const newX = (index * letterSpacing) - ((26 / 2) - 0.5) * letterSpacing;
+            span.innerText = char;
+            span.style.transform = `translateX(${newX}px)`;
+            span.style.setProperty('--translate-x', `${newX}px`);
+            container.appendChild(span);
+            letterSpans[char] = span;
+        });
+
+        let currentText = "";
+
+        function countPangramability(input, alphabet) {
+            const inputSet = new Set(input.toLowerCase());
+            const alphabetSet = new Set(alphabet.toLowerCase());
+
+            let count = 0;
+            for (const char of alphabetSet) {
+                if (inputSet.has(char)) {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        // Update word count
+        function updateWordCount(text) {
+  const words = text.trim().split(/\s+/).filter(w => w.match(/[a-z0-9]/i));
+  const letterCount = countPangramability(text, alphabet); // keep 26 allowed
+
+  // safe parse previous word count
+  const prevWordMatch = (wordCounter.innerText || "").match(/Word count:\s*(\d+)/i);
+  const previousCount = prevWordMatch ? parseInt(prevWordMatch[1], 10) : 0;
+
+  // safe parse previous letter count
+  let previousCountLetters = 0;
+  const prevLetterMatch = (lettersCounter.innerText || "").trim().match(/\((\d+)\s*\/\s*\d+\)/);
+  if (prevLetterMatch && prevLetterMatch[1]) previousCountLetters = parseInt(prevLetterMatch[1], 10);
+
+  // update displays (you asked to keep "/ 25" text)
+  wordCounter.innerText = `Word count: ${words.length}`;
+  lettersCounter.innerText = `(${letterCount} / 25)`;
+
+  // helper: reliably start an animation and set final color after it ends
+  function triggerAnim(el, animName, finalColor) {
+    if (!el) return;
+    // remove any existing animation
+    el.style.animation = "none";
+    // force reflow so restart is reliable
+    void el.offsetWidth;
+    // start animation
+    el.style.animation = `${animName} 0.5s ease-in-out forwards`;
+    // remove any previous handler
+    if (el._animEndHandler) {
+      el.removeEventListener("animationend", el._animEndHandler);
+      el._animEndHandler = null;
+    }
+    // apply final color on animationend (so keyframe color steps are visible)
+    el._animEndHandler = () => {
+      el.style.animation = "none";
+      if (finalColor) el.style.color = finalColor;
+      el.removeEventListener("animationend", el._animEndHandler);
+      el._animEndHandler = null;
+    };
+    el.addEventListener("animationend", el._animEndHandler);
+  }
+
+  // WORD thresholds (14)
+  if (words.length === 14 && previousCount !== 14) {
+    triggerAnim(wordCounter, "spinClockwise", "lawngreen");
+  } else if (words.length < 14 && previousCount >= 14) {
+    triggerAnim(wordCounter, "spinCounterclockwise", "white");
+  } else if (words.length > 14 && previousCount <= 14) {
+    triggerAnim(wordCounter, "redClockwise", "red");
+  } else {
+    // no threshold crossing — keep color consistent
+    if (words.length === 14) wordCounter.style.color = "lawngreen";
+    else if (words.length > 14) wordCounter.style.color = "red";
+    else wordCounter.style.color = "white";
+  }
+
+  // LETTER thresholds (25 target, allow 26 overflow)
+  if (letterCount === 25 && previousCountLetters !== 25) {
+    triggerAnim(lettersCounter, "spinClockwiseTranslateXexcluded", "lawngreen");
+  } else if (letterCount < 25 && previousCountLetters >= 25) {
+    // went from >=25 down to <25
+    triggerAnim(lettersCounter, "redCounterclockwise", "red");
+  } else if (letterCount > 25 && previousCountLetters <= 25) {
+    // overflow occurred (26)
+    triggerAnim(lettersCounter, "spinClockwiseNeutral", "white");
+  } else {
+    // no threshold crossing — keep color consistent
+    if (letterCount >= 25) lettersCounter.style.color = "lawngreen";
+    else lettersCounter.style.color = "red";
+  }
+}
+
+
+
+
+        // Reordering letters based on the selected order
+        function updateOrder() {
+            const selectedOrder = document.getElementById("order").value;
+            const reverse = document.getElementById("reverse").checked;
+            const sortedLetters = orders[selectedOrder].split("");
+
+            if (reverse) sortedLetters.reverse();
+
+            sortedLetters.forEach((char, index) => {
+                const span = letterSpans[char];
+                const letterSpacing = container.clientWidth / 37.8;
+                const newX = (index * letterSpacing) - ((26 / 2) - 0.5) * letterSpacing;
+                span.style.setProperty('--translate-x', `${newX}px`);
+                span.style.transform = `translateX(${newX}px)`;
+            });
+        }
+
+        document.getElementById("order").addEventListener("change", updateOrder);
+        document.getElementById("reverse").addEventListener("change", updateOrder);
+
+        // Handle typing effects
+        inputBox.addEventListener("input", function () {
+            const newText = inputBox.value.toLowerCase();
+            updateWordCount(newText);
+
+            newText.split("").forEach(letter => {
+                if (alphabet.includes(letter) && !currentText.includes(letter)) {
+                    let span = letterSpans[letter];
+                    span.style.animation = "none";
+                    span.offsetHeight; // Force reflow to restart animation
+                    span.style.animation = "spinClockwise 0.5s ease-in-out forwards";
+                    span.style.color = "lawngreen";
+                    setTimeout(() => span.style.animation = "none", 500);
+                }
+            });
+
+            currentText.split("").forEach(letter => {
+                if (alphabet.includes(letter) && !newText.includes(letter)) {
+                    let span = letterSpans[letter];
+                    span.style.animation = "none";
+                    span.offsetHeight; // Force reflow
+                    span.style.animation = "spinCounterclockwise 0.5s ease-in-out forwards";
+                    span.style.color = "white";
+                    setTimeout(() => span.style.animation = "none", 500);
+                }
+            });
+
+            currentText = newText;
+        });
+
+        // Pulsing animation on keydown
+        document.addEventListener("keydown", function (event) {
+            const key = event.key.toLowerCase();
+            if (alphabet.includes(key)) {
+                const span = letterSpans[key];
+                if (!span.style.animation.includes("spinClockwise") || !span.style.animation.includes("spinCounterclockwise")) {
+                    span.style.animation = "none";
+                    span.offsetHeight; // Force reflow
+                    span.style.animation = "pulse 0.3s ease-in-out";
+
+                }
+            }
+        });
+
+        function adjustInputWidth() {
+            inputBox.style.width = `${container.clientWidth / 1.8}px`;
+        }
+
+        window.addEventListener("resize", adjustInputWidth);
+        window.addEventListener("load", adjustInputWidth);
+
+
+    </script>
+</body></html>
