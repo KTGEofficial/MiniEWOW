@@ -5,9 +5,9 @@
 </head>
 <body>
     <h1>FGHIJ Website</h1>
-    <a href="" class="white">Loading</a><h2 id="prompt">Prompt : </h2>
-    <p id="wordCounter" style="--translate-x: 0;" class="white">Word count: 0</p>
-    <p id="lettersCounter" class="red">(0 / 25)</p>
+    <a href="" class="med" style="text-decoration: none;" id="a">Loading</a><h2 id="prompt">Prompt : </h2>
+    <p id="wordCounter" style="--translate-x: 0;" class="med">Word count: 0</p>
+    <p id="lettersCounter" class="low">(0 / 25)</p>
     <input type="text" id="inputBox" placeholder="Type here..." style="width: 390px;">
     <label for="order">Sort Order:</label>
     <select id="order">
@@ -32,6 +32,7 @@
             placeholder: "notreadybcfghijklmpqsuvwxz"
         };
         function parsePrompt(str) {
+            if (typeof str === 'string') { let promptData = str; } else { let promptData = str[0]; }
             const index = str.indexOf(" ");
             
             if (index === -1) {
@@ -48,7 +49,7 @@
                 return `Prompt ${str.slice(0, index)}: ${str.slice(index + 1)}`;
             }
         }
-        document.getElementById("lettersCounter").style.color = "red";
+        document.getElementById("lettersCounter").class = "low";
         const container = document.getElementById("letters");
         const inputBox = document.getElementById("inputBox");
         const wordCounter = document.getElementById("wordCounter"); const lettersCounter = document.getElementById("lettersCounter");
@@ -64,8 +65,63 @@
 
                 if (Object.keys(result).length === 1 && result.hasOwnProperty('prompt')) {
                     document.getElementById("prompt").innerText = parsePrompt(result.prompt);
+                    if (typeof result.prompt === 'string') { document.getElementById("a").innerText = "No URL Found"; document.getElementById("custom-css").textContent = `body{font-family:Arial,sans-serif;text-align:center;background:#3347da;color:#fff}.low{color:red}.med{color:#fff}.high{color:#7cfc00}span{font-weight:700}#inputBox{font-size:1.5rem;padding:10px;margin:20px;text-align:center}#letters{font-size:2rem;letter-spacing:5px;display:flex;justify-content:center;position:relative}#letters span{display:inline-block;position:absolute;transition:transform .5s ease-in-out,color .5s linear;transform-origin:center;color:#fff}#wordCounter{font-size:1.2rem;margin-top:10px}@keyframes spinClockwise{0%{transform:translateX(var(--translate-x)) rotateY(0deg)}33%{transform:translateX(var(--translate-x)) rotateY(90deg);color:#7cfc00}to{transform:translateX(var(--translate-x)) rotateY(1turn);color:#7cfc00}}@keyframes spinClockwiseTranslateXexcluded{0%{transform:rotateY(0deg)}50%{transform:rotateY(90deg);color:#7cfc00}to{transform:rotateY(1turn);color:#7cfc00}}@keyframes redClockwise{0%{transform:rotateY(0deg)}33%{transform:rotateY(90deg);color:red}to{transform:rotateY(1turn);color:red}}@keyframes redCounterclockwise{0%{transform:rotateY(1turn)}50%{transform:rotateY(90deg);color:red}to{transform:rotateY(0deg);color:red}}@keyframes spinCounterclockwise{0%{transform:translateX(var(--translate-x)) rotateY(1turn)}66%{transform:translateX(var(--translate-x)) rotateY(90deg);color:#fff}to{transform:translateX(var(--translate-x)) rotateY(0deg);color:#fff}}@keyframes spinClockwiseNeutral{0%{transform:rotateY(0deg)}50%{transform:rotateY(90deg);color:#fff}to{transform:rotateY(1turn);color:#fff}}@keyframes pulse{0%,to{transform:translateX(var(--translate-x)) scale(1)}50%{transform:translateX(var(--translate-x)) scale(1.5)}}` }
+                    else { document.getElementById("a").innerText = `Watch FGHIJ ${result.prompt[2].slice(0, result.prompt[2].indexOf(" "))}`;
+                document.getElementById("a").href = result.prompt[3].slice(0, result.prompt[3].indexOf(" "));
+                document.getElementById("custom-css").textContent = `
+body,html{height:100%}
+body{
+  background-color:${result.prompt[2].slice(result.prompt[2].indexOf(" ") + 1)};
+  font-family:Arial,sans-serif;
+  text-align:center;
+  color:${result.prompt[3].split(" ")[2]}
+}
+.low{color:${result.prompt[3].split(" ")[3]}}
+.med{color:${result.prompt[3].split(" ")[2]}}
+.high{color:${result.prompt[3].split(" ")[1]}}
+span{font-weight:700}
+#inputBox{font-size:1.5rem;padding:10px;margin:20px;text-align:center}
+#letters{font-size:2rem;letter-spacing:5px;display:flex;justify-content:center;position:relative}
+#letters span{display:inline-block;position:absolute;transition:transform .5s ease-in-out,color .5s linear;transform-origin:center}
+#wordCounter{font-size:1.2rem;margin-top:10px}
+@keyframes spinClockwise{
+  0%{transform:translateX(var(--translate-x)) rotateY(0deg)}
+  33%{transform:translateX(var(--translate-x)) rotateY(90deg);color:${result.prompt[3].split(" ")[1]}}
+  to{transform:translateX(var(--translate-x)) rotateY(1turn);color:${result.prompt[3].split(" ")[1]}}
+}
+@keyframes spinClockwiseTranslateXexcluded{
+  0%{transform:rotateY(0deg)}
+  50%{transform:rotateY(90deg);color:${result.prompt[3].split(" ")[1]}}
+  to{transform:rotateY(1turn);color:${result.prompt[3].split(" ")[1]}}
+}
+@keyframes redClockwise{
+  0%{transform:rotateY(0deg)}
+  33%{transform:rotateY(90deg);color:${result.prompt[3].split(" ")[3]}}
+  to{transform:rotateY(1turn);color:${result.prompt[3].split(" ")[3]}}
+}
+@keyframes redCounterclockwise{
+  0%{transform:rotateY(1turn)}
+  50%{transform:rotateY(90deg);color:${result.prompt[3].split(" ")[3]}}
+  to{transform:rotateY(0deg);color:${result.prompt[3].split(" ")[3]}}
+}
+@keyframes spinCounterclockwise{
+  0%{transform:translateX(var(--translate-x)) rotateY(1turn)}
+  66%{transform:translateX(var(--translate-x)) rotateY(90deg);color:${result.prompt[3].split(" ")[2]}}
+  to{transform:translateX(var(--translate-x)) rotateY(0deg);color:${result.prompt[3].split(" ")[2]}}
+}
+@keyframes spinClockwiseNeutral{
+  0%{transform:rotateY(0deg)}
+  50%{transform:rotateY(90deg);color:${result.prompt[3].split(" ")[2]}}
+  to{transform:rotateY(1turn);color:${result.prompt[3].split(" ")[2]}}
+}
+@keyframes pulse{
+  0%,to{transform:translateX(var(--translate-x)) scale(1)}
+  50%{transform:translateX(var(--translate-x)) scale(1.5)}
+}
+`;}
                 } else {
                     document.getElementById("prompt").innerText = "Error retrieving prompt: Can not retrieve prompt from external script!";
+                    document.getElementById("a").innerText = "Only the FGHIJ macro and the CDEFG macro are supported";
                 }
             } catch (error) {
                 console.error("Error retrieving prompt:", error);
@@ -146,31 +202,31 @@
 
   // WORD thresholds (14)
   if (words.length === 14 && previousCount !== 14) {
-    triggerAnim(wordCounter, "spinClockwise", "lawngreen");
+    triggerAnim(wordCounter, "spinClockwise", "high");
   } else if (words.length < 14 && previousCount >= 14) {
-    triggerAnim(wordCounter, "spinCounterclockwise", "white");
+    triggerAnim(wordCounter, "spinCounterclockwise", "med");
   } else if (words.length > 14 && previousCount <= 14) {
-    triggerAnim(wordCounter, "redClockwise", "red");
+    triggerAnim(wordCounter, "redClockwise", "low");
   } else {
     // no threshold crossing — keep color consistent
-    if (words.length === 14) wordCounter.style.color = "lawngreen";
-    else if (words.length > 14) wordCounter.style.color = "red";
-    else wordCounter.style.color = "white";
+    if (words.length === 14) wordCounter.class = "high";
+    else if (words.length > 14) wordCounter.class = "low";
+    else wordCounter.class = "med";
   }
 
   // LETTER thresholds (25 target, allow 26 overflow)
   if (letterCount === 25 && previousCountLetters !== 25) {
-    triggerAnim(lettersCounter, "spinClockwiseTranslateXexcluded", "lawngreen");
+    triggerAnim(lettersCounter, "spinClockwiseTranslateXexcluded", "high");
   } else if (letterCount < 25 && previousCountLetters >= 25) {
     // went from >=25 down to <25
-    triggerAnim(lettersCounter, "redCounterclockwise", "red");
+    triggerAnim(lettersCounter, "redCounterclockwise", "low");
   } else if (letterCount > 25 && previousCountLetters <= 25) {
     // overflow occurred (26)
-    triggerAnim(lettersCounter, "spinClockwiseNeutral", "white");
+    triggerAnim(lettersCounter, "spinClockwiseNeutral", "med");
   } else {
     // no threshold crossing — keep color consistent
-    if (letterCount >= 25) lettersCounter.style.color = "lawngreen";
-    else lettersCounter.style.color = "red";
+    if (letterCount >= 25) lettersCounter.class = "med";
+    else lettersCounter.class = "low";
   }
 }
 // The secret sequence
@@ -179,8 +235,8 @@ let secretPosition = 0;
 
 document.addEventListener("keydown", (event) => {
     const key = event.key.toLowerCase();
-    if (key === secret[position]) {
-        position++;
+    if (key === secret[secretPosition]) {
+        secretPosition++;
 
         // If full sequence matched
         if (secretPosition === secret.length) {
@@ -188,7 +244,7 @@ document.addEventListener("keydown", (event) => {
             triggerSecretOrder();
         }
     } else {
-        position = 0;
+        secretPosition = 0;
     }
 });
 
@@ -237,7 +293,7 @@ function triggerSecretOrder() {
                     span.style.animation = "none";
                     span.offsetHeight; // Force reflow to restart animation
                     span.style.animation = "spinClockwise 0.5s ease-in-out forwards";
-                    span.style.color = "lawngreen";
+                    span.class = "high";
                     setTimeout(() => span.style.animation = "none", 500);
                 }
             });
@@ -248,7 +304,7 @@ function triggerSecretOrder() {
                     span.style.animation = "none";
                     span.offsetHeight; // Force reflow
                     span.style.animation = "spinCounterclockwise 0.5s ease-in-out forwards";
-                    span.style.color = "white";
+                    span.class = "med";
                     setTimeout(() => span.style.animation = "none", 500);
                 }
             });
