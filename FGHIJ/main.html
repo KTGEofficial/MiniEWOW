@@ -231,24 +231,41 @@ el.classNameList.add(finalColor); }
   }
 }
 // The secret sequence
-const secret = ["n", "o", "t", "r", "e", "a", "d", "y"];
-let secretPosition = 0;
+const secret0 = ["n", "o", "t", "r", "e", "a", "d", "y"];
+let secret0Position = 0;
 
 document.addEventListener("keydown", (event) => {
     const key = event.key.toLowerCase();
-    if (key === secret[secretPosition]) {
-        secretPosition++;
+    if (key === secret0[secret0Position]) {
+        secret0Position++;
 
         // If full sequence matched
-        if (secretPosition === secret.length) {
-            secretPosition = 0;
+        if (secret0Position === secret0.length) {
+            secret0Position = 0;
             triggerSecretOrder();
         }
     } else {
-        secretPosition = 0;
+        secret0Position = 0;
     }
 });
+// Another secret sequence
+const secret1 = ["u", "n", "s", "i", "z", "e", "d", "l", "y"];
+let secret1Position = 0;
 
+document.addEventListener("keydown", (event) => {
+    const key = event.key.toLowerCase();
+    if (key === secret1[secret1Position]) {
+        secret1Position++;
+
+        // If full sequence matched
+        if (secret1Position === secret1.length) {
+            secret1Position = 0;
+            window.location.href = "https://www.youtube.com/watch?v=3Hj3U18FHgQ";
+        }
+    } else {
+        secret1Position = 0;
+    }
+});
 function triggerSecretOrder() {
     const select = document.getElementById("order");
     if (!select) return;
